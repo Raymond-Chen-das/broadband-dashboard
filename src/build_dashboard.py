@@ -15,6 +15,7 @@
 from __future__ import annotations
 
 import datetime as dt
+import sys
 from pathlib import Path
 
 import plotly.graph_objects as go
@@ -25,6 +26,10 @@ from compute_metrics import fetch_metrics
 ROOT = Path(__file__).resolve().parent.parent
 OUT = ROOT / "dashboard"
 OUT.mkdir(parents=True, exist_ok=True)
+
+# --inline：把 Plotly 內嵌成單一自足檔案（約 4.7MB），供寄送或單獨上傳。
+# 預設不內嵌，理由見 build() 內的註解。
+INLINE = "--inline" in sys.argv
 
 # ── 調色盤（dataviz 參考實例，validate_palette.js 全 PASS）────────────────
 # 兩陣營是**兩個實體**，所以用 categorical 兩槽，不是同色相深淺。
@@ -288,8 +293,14 @@ def build(rows) -> str:
     brk_share = abs(brk_pp / delta) * 100
     residual = delta - brk_pp          # 扣掉該月之後剩下的降幅
 
+    # 預設把 plotly.min.js 放成同目錄的獨立檔（`directory`），不內嵌。
+    # 內嵌版是 4.7MB，而月更新管線每個月都會重生一次看板——每年就往 git
+    # 塞 56MB 的新 blob，而其中 99% 是每次都一樣的函式庫。
+    # 外部引用同樣可離線開啟（只要 plotly.min.js 跟著同一個資料夾）。
+    # 要寄出或單獨上傳的單一檔版本，用 `--inline` 產生。
     opts = dict(full_html=False, config={"displayModeBar": False})
-    fig_main = main_figure(rows).to_html(include_plotlyjs=True, **opts)
+    js = True if INLINE else "directory"
+    fig_main = main_figure(rows).to_html(include_plotlyjs=js, **opts)
     fig_mock = mock_figure().to_html(include_plotlyjs=False, **opts)
 
     return f"""<meta charset="utf-8">
@@ -411,12 +422,32 @@ def build(rows) -> str:
 </div>"""
 
 
+def write_plotlyjs() -> Path:
+    """把 plotly.min.js 寫進輸出目錄。
+
+    **`to_html(include_plotlyjs="directory")` 只產生 <script src> 引用，
+    不會幫你把檔案放過去**——少了這一步，看板開起來圖區全白。
+    （2026-08-08 實測踩到：改成外部引用後只看檔案變小就以為成功，
+    渲染截圖才發現整張圖沒了。）
+    """
+    import plotly.offline
+    js = OUT / "plotly.min.js"
+    if not js.exists():
+        js.write_text(plotly.offline.get_plotlyjs(), encoding="utf-8")
+    return js
+
+
 def main() -> int:
     rows = fetch_metrics()
     html = build(rows)
     path = OUT / "index.html"
     path.write_text(html, encoding="utf-8")
-    print(f"已產生：{path.relative_to(ROOT)}　{path.stat().st_size:,} bytes")
+    print(f"已產生：{path.relative_to(ROOT)}　{path.stat().st_size:,} bytes"
+          f"　({'內嵌' if INLINE else '外部引用'})")
+    if not INLINE:
+        js = write_plotlyjs()
+        print(f"　　　　　{js.relative_to(ROOT)}　{js.stat().st_size:,} bytes"
+              "（與 index.html 同目錄即可離線開啟）")
     a = next(r for r in rows if r.ym == "2019-01")
     z = rows[-1]
     print(f"  期間 {rows[0].ym} ~ {z.ym}（{len(rows)} 期）")

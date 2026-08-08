@@ -75,6 +75,12 @@ py -3.13 -m venv .venv
 .\.venv\Scripts\python.exe -m pytest -q                # tests
 ```
 
+The dashboard loads `plotly.min.js` from its own directory, so it opens offline as long
+as the folder stays together. `build_dashboard.py --inline` produces a single
+self-contained ~4.7 MB file instead, for emailing or uploading on its own — that variant
+is deliberately not committed, because the monthly pipeline regenerates the dashboard and
+would add a fresh multi-megabyte blob to history every time.
+
 Optional: `src\db_experiments.py` (database tuning experiments — builds a clearly
 labelled ~2M-row synthetic table), `src\update_monthly.py` (monthly refresh pipeline).
 
@@ -127,7 +133,7 @@ src/       pipeline: sources → contracts → splice → load → metrics → d
 docs/      spec, decision trail (append-only), database experiments
 logs/      pre-registration (append-only), raw experiment measurements
 data/raw/  the two source CSVs as downloaded
-dashboard/ generated single-page HTML
+dashboard/ generated dashboard (index.html + plotly.min.js), one-page summary + PDF
 tests/     contract and Ground Truth tests
 ```
 

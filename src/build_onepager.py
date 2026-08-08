@@ -79,14 +79,14 @@ def build(rows) -> str:
     return f"""<meta charset="utf-8">
 <title>專案摘要｜中華電信固網 2026 公開目標追蹤板</title>
 <style>
-@page {{ size: A4; margin: 13mm 12mm; }}
+@page {{ size: A4; margin: 10mm 11mm; }}
 *{{box-sizing:border-box;}}
-body{{margin:0;background:#f4f4f2;color:{INK};font-family:{FONT};line-height:1.62;
-     font-size:12.5px;-webkit-print-color-adjust:exact;print-color-adjust:exact;}}
-.page{{max-width:900px;margin:0 auto;background:#fff;padding:30px 34px 26px;}}
+body{{margin:0;background:#f4f4f2;color:{INK};font-family:{FONT};line-height:1.5;
+     font-size:11.8px;-webkit-print-color-adjust:exact;print-color-adjust:exact;}}
+.page{{max-width:900px;margin:0 auto;background:#fff;padding:24px 28px 20px;}}
 h1{{font-size:19px;font-weight:660;margin:0 0 3px;letter-spacing:-.01em;}}
 .sub{{font-size:11.5px;color:{MUTED};margin:0 0 16px;}}
-h2{{font-size:13.5px;font-weight:650;margin:20px 0 7px;padding-bottom:4px;
+h2{{font-size:13px;font-weight:650;margin:13px 0 5px;padding-bottom:4px;
    border-bottom:1.5px solid {INK};letter-spacing:-.005em;}}
 .hero{{display:flex;align-items:baseline;gap:16px;background:#fafafa;
       border-left:3px solid {TELCO_C};padding:12px 16px;margin-bottom:4px;}}

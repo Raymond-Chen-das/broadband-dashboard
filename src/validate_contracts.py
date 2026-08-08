@@ -55,9 +55,16 @@ COLS_27953 = [
 ]
 
 EXPECTED = {
-    "7164": {"rows": 88, "first": (2019, 1), "last": (2026, 4)},
-    "27953": {"rows": 164, "first": (2007, 1), "last": (2020, 8)},
+    "7164": {"rows": 88, "first": (2019, 1), "last": (2026, 4), "live": True},
+    "27953": {"rows": 164, "first": (2007, 1), "last": (2020, 8), "live": False},
 }
+
+# `--allow-growth`：給月更新管線用。
+# 7164 仍在更新，把列數與結束月釘死等於**新月份一到就被自己的契約擋下**。
+# 放寬的只有「列數 ≥ 快照」與「結束月 ≥ 快照」這兩項；
+# 結構性檢查（欄位、數值、算術、連續性、起始月）**一律維持嚴格**。
+# 27953 已停更，不論如何都用嚴格比對——它若長出新月份才是真的出事了。
+ALLOW_GROWTH = "--allow-growth" in sys.argv
 
 # 小計算術的加總項（陷阱 2：兩份的總計定義不同，絕不可互相比對）
 SUM_7164 = {
@@ -133,8 +140,10 @@ def check_file(tag: str, path: Path, expected_cols: list[str],
 
     # --- 檢查 2：資料列數 ---------------------------------------------------
     exp_rows = EXPECTED[tag]["rows"]
-    check(f"[{tag}] 資料列數", len(rows) == exp_rows,
-          f"實際 {len(rows)} 列 / 契約 {exp_rows} 列")
+    growth = ALLOW_GROWTH and EXPECTED[tag]["live"]
+    check(f"[{tag}] 資料列數", len(rows) >= exp_rows if growth else len(rows) == exp_rows,
+          f"實際 {len(rows)} 列 / 契約 {'≥ ' if growth else ''}{exp_rows} 列"
+          + (f"（新增 {len(rows) - exp_rows} 個月）" if growth and len(rows) > exp_rows else ""))
 
     # --- 檢查 3：數值可解析（去逗號後為非負整數）----------------------------
     numeric_cols = [c for c in expected_cols if c not in ("年月", "年度", "月份")]
@@ -200,10 +209,12 @@ def check_file(tag: str, path: Path, expected_cols: list[str],
 
     # --- 檢查 6：期間範圍 ---------------------------------------------------
     exp_first, exp_last = EXPECTED[tag]["first"], EXPECTED[tag]["last"]
-    ok = uniq[0] == exp_first and uniq[-1] == exp_last
+    # 起始月一律嚴格：它若變動，代表上游改了歷史，那是必須擋下的事。
+    ok = uniq[0] == exp_first and (uniq[-1] >= exp_last if growth else uniq[-1] == exp_last)
     check(f"[{tag}] 期間範圍", ok,
           f"{uniq[0][0]}-{uniq[0][1]:02d} ~ {uniq[-1][0]}-{uniq[-1][1]:02d}"
-          f"（契約 {exp_first[0]}-{exp_first[1]:02d} ~ {exp_last[0]}-{exp_last[1]:02d}）")
+          f"（契約 {exp_first[0]}-{exp_first[1]:02d} ~ "
+          f"{'≥ ' if growth else ''}{exp_last[0]}-{exp_last[1]:02d}）")
 
     # --- 附帶資訊：排序方向（不列入通過與否，僅記錄）------------------------
     direction = "升序" if periods == sorted(periods) else (

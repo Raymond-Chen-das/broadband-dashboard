@@ -1,0 +1,49 @@
+{
+  "real_rows": 1160,
+  "bench_rows": 1990560,
+  "exp1": {
+    "before": {
+      "exec_ms": 309.199,
+      "plan_ms": 0.435,
+      "rows_removed": 636064,
+      "shared_blocks": 16604,
+      "heap_fetches": null,
+      "nodes": "Sort → Aggregate → Gather Merge → Seq Scan",
+      "exec_ms_median": 217.782,
+      "exec_ms_min": 136.247,
+      "exec_ms_max": 335.837,
+      "runs": 7
+    },
+    "after": {
+      "exec_ms": 47.714,
+      "plan_ms": 0.236,
+      "rows_removed": 0,
+      "shared_blocks": 409,
+      "heap_fetches": 0,
+      "nodes": "Sort → Aggregate → Index Only Scan",
+      "exec_ms_median": 48.315,
+      "exec_ms_min": 44.301,
+      "exec_ms_max": 62.733,
+      "runs": 7
+    },
+    "speedup": 4.507544240918969,
+    "index_build_s": 5.509068200131878
+  },
+  "exp2": {
+    "idx_before": 2,
+    "idx_after": 5,
+    "upsert_rows": 59160,
+    "t_before_median": 2.2102112001739442,
+    "t_before_range": [
+      1.6398657001554966,
+      3.1957573001272976
+    ],
+    "t_after_median": 3.1492181001231074,
+    "t_after_range": [
+      2.1079293000511825,
+      4.177300099981949
+    ],
+    "slowdown": 1.4248493989512239,
+    "index_build_s": 3.5214349997695535
+  }
+}

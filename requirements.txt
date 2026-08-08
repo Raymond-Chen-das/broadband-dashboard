@@ -1,0 +1,11 @@
+# Python 3.13（本機實測 3.13.3）
+#
+# 重跑方式：
+#   docker compose up -d                                   # 起 PostgreSQL 17
+#   py -3.13 -m venv .venv
+#   .\.venv\Scripts\python.exe -m pip install -r requirements.txt
+
+psycopg2-binary==2.9.12
+pandas==3.0.5
+plotly==6.9.0
+pytest==9.1.1

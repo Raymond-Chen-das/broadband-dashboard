@@ -1,0 +1,15 @@
+# Python 虛擬環境（本機隔離，不進版控）
+.venv/
+__pycache__/
+*.py[cod]
+
+# PostgreSQL 資料（由 docker named volume 管理；此列防止本機誤產生的目錄進版控）
+pgdata/
+
+# 備份檔（依治理規則，驗證通過即刪；萬一遺留也不進版控）
+*.bak
+*.bak-*
+
+# OS
+Thumbs.db
+desktop.ini

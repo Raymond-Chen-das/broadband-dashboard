@@ -16,7 +16,11 @@ where open data runs out, and knowing which internal fields would close the gap.
 The one thing public data *does* show, and shows clearly:
 
 > **The telco camp's share of Taiwan's fixed broadband accounts fell from 75.37% (2019-01)
-> to 66.36% (2026-04) — 9.01 percentage points over seven years.**
+> to 66.40% (2026-05) — 8.97 percentage points over seven years.**
+
+Figures move as the upstream dataset updates; `src/update_monthly.py` refreshes everything
+and every displayed number is computed, never hard-coded. The pinned regression anchors are
+75.37% at 2019-01 and 66.36% at 2026-04 (−9.01 pp), which the test suite asserts exactly.
 
 | # | Announced target | Trackable? | What's missing |
 |---|---|---|---|
@@ -80,11 +84,13 @@ labelled ~2M-row synthetic table), `src\update_monthly.py` (monthly refresh pipe
 |---|---|
 | Contract checks | **16/16 pass**, zero tolerance used |
 | Splice overlap | 20 months × 3 columns = **60/60 exactly equal**, median and max diff **0.0000%** |
-| Rows loaded | 1,160 (232 months × 5 technologies), 2007-01 → 2026-04 |
+| Rows loaded | 1,165 (233 months × 5 technologies), 2007-01 → 2026-05 |
 | Idempotency | second run identical: row count, sum, **and row-level MD5** |
-| Telco camp share | 75.37% (2019-01) → 66.36% (2026-04), **−9.01 pp** |
+| Telco camp share | 75.37% (2019-01) → 66.40% (2026-05), **−8.97 pp** |
 | Query tuning | Parallel Seq Scan → Index Only Scan, buffers **16,604 → 409** |
 | Index write cost | upsert median **2.21s → 3.15s** after 2→5 indexes |
+| Tests | **22 pass**, database-free, run in CI |
+| Monthly pipeline | run end-to-end against live data: 2026-04 → 2026-05, then correctly reported "no new month" on the next run |
 
 **On the 0.0000% splice result:** 20 periods agreeing *exactly* is much better explained
 by both datasets originating from the same upstream NCC report than by two independent

@@ -275,8 +275,18 @@ def kpi_cards() -> str:
 
 def build(rows) -> str:
     first, last = rows[0], rows[-1]
+    # 錨點固定在 2019-01（7164 的起點，也是核心發現的基準），終點跟著最新資料走。
+    # **這些數字一律由資料算出，不得寫死**——寫死的顯示值會在下一次月更新後
+    # 與圖上的資料靜靜地分家，而那正是本專案定義的失敗模式。
     a, z = next(r for r in rows if r.ym == "2019-01"), last
     delta = z.telco_share - a.telco_share
+    years = round((int(z.ym[:4]) - int(a.ym[:4])) + (int(z.ym[5:]) - int(a.ym[5:])) / 12)
+
+    # 2020-01 斷點對占比的單月衝擊，以及它佔全期變化的比例——同樣由資料算，不寫死。
+    i = next(k for k, r in enumerate(rows) if r.ym == "2020-01")
+    brk_pp = rows[i].telco_share - rows[i - 1].telco_share
+    brk_share = abs(brk_pp / delta) * 100
+    residual = delta - brk_pp          # 扣掉該月之後剩下的降幅
 
     opts = dict(full_html=False, config={"displayModeBar": False})
     fig_main = main_figure(rows).to_html(include_plotlyjs=True, **opts)
@@ -288,12 +298,12 @@ def build(rows) -> str:
 <style>{CSS}</style>
 <div class="wrap">
 
-<h1>台灣固網市場，電信陣營的份額七年掉了 9 個百分點</h1>
+<h1>台灣固網市場，電信陣營的份額 {years} 年掉了 {abs(delta):.0f} 個百分點</h1>
 <p class="lede">中華電信固網 2026 公開目標追蹤板　·　資料來源：NCC／data.gov.tw 公開統計　·
 資料期間 {first.ym} ~ {last.ym}</p>
 
 <div class="hero">
-  <div class="figure">75.4% → 66.4%　<small>七年 {delta:+.2f} 個百分點</small></div>
+  <div class="figure">{a.telco_share:.1f}% → {z.telco_share:.1f}%　<small>{years} 年 {delta:+.2f} 個百分點</small></div>
   <div class="note">
     這是政府公開統計、可驗證的硬數字，也是<b>為什麼中華電信要在 2026 年打這場降價保衛戰</b>。<br>
     <b>但請先記住這個數字的身分</b>：它是<b>技術陣營層級的代理指標</b>，不是中華電信自己的市占——
@@ -315,7 +325,7 @@ def build(rows) -> str:
     <b style="color:{BREAK_C};">⚠ 兩處資料斷點（紅色虛線）</b>——2009-04 與 2020-01 各出現一次單月劇變，
     次月即回到原趨勢。<b>2020-01 落在兩份來源的重疊期內，兩份報一模一樣的數字</b>，
     所以是上游資料本身如此，不是接合造成的。
-    該月使電信陣營占比單月下降 <b>1.10 個百分點，佔全期 {abs(delta):.2f} pp 的 12.2%</b>。
+    該月使電信陣營占比單月下降 <b>{abs(brk_pp):.2f} 個百分點，佔全期 {abs(delta):.2f} pp 的 {brk_share:.1f}%</b>。
     成因<b>未能證實</b>——查證過程見方法說明。
   </div>
 </div>
@@ -386,7 +396,8 @@ def build(rows) -> str:
     <li><b>事件時點僅為視覺標記</b>——2022-05 MSO 價格戰（工商時報 2022-05-23）與
         2026-03-18 中華電信降價（經濟日報／MoneyDJ），<b>僅在圖上標示，不估計任何效果</b>。</li>
     <li><b>兩處資料斷點成因未證實</b>——2009-04 與 2020-01。若 2020-01 確為統計口徑變更，
-        則七年降幅中約 <b>12%</b> 屬定義效果而非市場變化，其餘約 −7.9 個百分點仍為實在的趨勢。</li>
+        則 {years} 年降幅中約 <b>{brk_share:.0f}%</b> 屬定義效果而非市場變化，
+        其餘約 {residual:+.1f} 個百分點仍為實在的趨勢。</li>
   </ol>
 </div>
 

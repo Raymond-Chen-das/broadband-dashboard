@@ -26,8 +26,12 @@ jobs:
       - name: Run tests
         run: pytest -q
 
+      # --allow-growth 是必要的：EXPECTED 裡的 88 列／2026-04 是
+      # **2026-08-02 那次量測的 Ground Truth 錨點**，而 committed 的快照會隨月更新前進。
+      # 嚴格模式在這裡等於要求快照永遠停在錨點那一天，第一次月更新就會紅。
+      # 真正的回歸防線是 pytest 裡對 2019-01／2026-04 兩個錨點的精確斷言，那不受影響。
       - name: Contract validation on the committed snapshot
-        run: python src/validate_contracts.py
+        run: python src/validate_contracts.py --allow-growth
 
       - name: Splice check
         run: python src/splice_check.py

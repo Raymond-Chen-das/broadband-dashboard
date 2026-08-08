@@ -72,12 +72,27 @@ def test_ascending_after_load(loader):
 
 
 # ── Ground Truth：列數與期間 ───────────────────────────────────────────
-def test_row_counts_and_span():
-    a, b = load_7164(), load_27953()
-    pa, pb = sorted({r.period for r in a}), sorted({r.period for r in b})
-    assert len(pa) == 88 and len(pb) == 164
-    assert pa[0] == (2019, 1) and pa[-1] == (2026, 4)
-    assert pb[0] == (2007, 1) and pb[-1] == (2020, 8)
+def _span_months(first, last):
+    return (last[0] - first[0]) * 12 + (last[1] - first[1]) + 1
+
+
+def test_frozen_source_is_exact():
+    """27953 已停更——它的一切都該是精確值。長出新月份才是真的出事了。"""
+    p = sorted({r.period for r in load_27953()})
+    assert len(p) == 164
+    assert p[0] == (2007, 1) and p[-1] == (2020, 8)
+
+
+def test_live_source_holds_its_invariants():
+    """7164 仍在更新，所以**測不變量而不是測快照**。
+
+    釘死 88 列的版本在 2026-05 到達的當天就會紅——那不是抓到 bug，
+    是測試自己過期。真正該守的是：起點不動、期數與跨距一致、只會往前長。
+    """
+    p = sorted({r.period for r in load_7164()})
+    assert p[0] == (2019, 1), "起始月變動代表上游改了歷史，必須擋下"
+    assert p[-1] >= (2026, 4), "最新月份不該倒退"
+    assert len(p) == _span_months(p[0], p[-1]), "期數與跨距不符＝有缺月或重複"
 
 
 @pytest.mark.parametrize("loader", [load_7164, load_27953])
@@ -133,8 +148,10 @@ def test_splice_takes_7164_over_the_overlap():
             assert r.source == "ncc_7164"
         else:
             assert r.source == "ncc_27953"
-    assert sorted({r.period for r in out})[0] == (2007, 1)
-    assert len(out) == 232 * 5
+    periods = sorted({r.period for r in out})
+    assert periods[0] == (2007, 1)
+    assert len(out) == len(periods) * 5          # 每期恰好 5 種技術別
+    assert len(periods) == _span_months(periods[0], periods[-1])
 
 
 # ── Ground Truth：核心發現 ─────────────────────────────────────────────
@@ -172,15 +189,16 @@ def test_subtotal_arithmetic_is_exact():
     cases = [
         (F_7164, "小計_固網（有線）寬頻帳號數",
          ["ADSL_固網（有線）寬頻帳號數", "FTTX_固網（有線）寬頻帳號數",
-          "Cable_Modem固網（有線）寬頻帳號數", "Leased_Line_固網（有線）寬頻帳號數"], 88),
+          "Cable_Modem固網（有線）寬頻帳號數", "Leased_Line_固網（有線）寬頻帳號數"]),
         (F_27953, "總計",
          ["有線寬頻帳號-ADSL", "有線寬頻帳號-FTTX", "有線寬頻帳號-Cable Modem",
-          "有線寬頻帳號-固接專線", "無線寬頻帳號-PWLAN"], 164),
+          "有線寬頻帳號-固接專線", "無線寬頻帳號-PWLAN"]),
     ]
-    for path, total_col, parts, n in cases:
+    # 不釘列數——那由上面兩個 span 測試負責。這裡要的是「**每一列**都零容差相等」，
+    # 不論檔案長到幾列。
+    for path, total_col, parts in cases:
         with path.open(encoding="utf-8-sig", newline="") as fh:
             rows = list(csv.DictReader(fh))
-        assert len(rows) == n
         exact = sum(1 for r in rows
                     if _to_int(r[total_col]) == sum(_to_int(r[c]) for c in parts))
-        assert exact == n, f"{path.name}: 只有 {exact}/{n} 完全相等"
+        assert exact == len(rows), f"{path.name}: 只有 {exact}/{len(rows)} 完全相等"

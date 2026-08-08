@@ -1,0 +1,33 @@
+name: tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      # 這些測試刻意不碰資料庫——它們驗的是解析、接合與 Ground Truth，
+      # 只讀 data/raw/ 的兩份 CSV。落庫與指標的正確性由本機的
+      # load_postgres.py --verify（逐列 md5）與 compute_metrics.py 自檢負責。
+      - name: Run tests
+        run: pytest -q
+
+      - name: Contract validation on the committed snapshot
+        run: python src/validate_contracts.py
+
+      - name: Splice check
+        run: python src/splice_check.py

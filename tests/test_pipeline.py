@@ -4,7 +4,7 @@
 CI 才掛得上。落庫與指標的正確性由 `load_postgres.py --verify`（逐列 md5）
 與 `compute_metrics.py` 的自檢負責，那兩層需要資料庫。
 
-Ground Truth 來源：`docs/prompt-build-broadband-dashboard.md` 第一節，
+Ground Truth 來源：`logs/decisions.log`（開工前存檔），
 由規格制定者於 2026-08-02 實測。**測試失敗代表解析錯了，不是改測試的理由。**
 """
 

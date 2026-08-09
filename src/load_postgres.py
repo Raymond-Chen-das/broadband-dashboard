@@ -1,6 +1,6 @@
 """階段 3：落庫（星型 schema ＋ 冪等 upsert）。
 
-schema 依 `docs/prompt-build-broadband-dashboard.md` 階段 3 的 DDL，
+schema 依 本檔階段 3 的 DDL（原出處為已刪除的一次性 prompt），
 另補 `dim_period`——規格 5.3 明列星型為 `fact_subscriptions_monthly` ／
 `dim_technology` ／ `dim_period` 三張表，prompt 的 DDL 漏了第三張。
 **設計以規格為正本**（prompt 第〇節：設計爭議一律回規格）。

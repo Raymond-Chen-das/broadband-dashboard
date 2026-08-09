@@ -4,14 +4,12 @@
 `logs/decisions.log` 決定 C——外部求職者模擬內部公文，形式上正是「假裝已經在裡面」，
 是整包交付物裡最靠近僭越紅線的一件。改以視覺化良好的一頁 HTML 呈現。
 
-用途：快速摘要。可直接以瀏覽器列印為 PDF（已寫好 A4 列印樣式）。
+用途：快速摘要。只給螢幕看，不產生 PDF。
 
 **所有數字由資料算出，不得寫死**——與看板同一份 metrics 來源。
 
 用法：
     .\\.venv\\Scripts\\python.exe src\\build_onepager.py
-    # 產生 PDF（需要 Edge）：
-    # msedge --headless=new --print-to-pdf=onepager.pdf --no-pdf-header-footer <file>
 """
 
 from __future__ import annotations
@@ -45,8 +43,10 @@ def qr_svg_data_uri(url: str) -> str:
     return f"data:image/svg+xml;base64,{b64}"
 
 TELCO_C, CABLE_C = "#2a78d6", "#eb6834"
-INK, INK2, MUTED = "#0b0b0b", "#52514e", "#898781"
-GRID, WARN, CRIT = "#e1e0d9", "#b07500", "#b03030"
+PLANE, SURFACE, RAISED = "#dce9f3", "#f2f8fc", "#e8f1f8"
+HAIR = "rgba(20,54,84,0.14)"
+INK, INK2, MUTED = "#0d1f2d", "#3d5568", "#6b8299"
+GRID, WARN, CRIT = "rgba(20,54,84,0.10)", "#8a5a00", "#c0392b"
 FONT = 'system-ui, -apple-system, "Segoe UI", "Microsoft JhengHei", sans-serif'
 
 # 條件對照：只列**本專案真的產出了證據**的項目。
@@ -100,17 +100,17 @@ def build(rows) -> str:
     return f"""<meta charset="utf-8">
 <title>專案摘要｜中華電信固網 2026 公開目標追蹤板</title>
 <style>
-@page {{ size: A4; margin: 10mm 11mm; }}
 *{{box-sizing:border-box;}}
-body{{margin:0;background:#f4f4f2;color:{INK};font-family:{FONT};line-height:1.5;
-     font-size:11.8px;-webkit-print-color-adjust:exact;print-color-adjust:exact;}}
-.page{{max-width:900px;margin:0 auto;background:#fff;padding:24px 28px 20px;}}
+body{{margin:0;background:{PLANE};color:{INK};font-family:{FONT};line-height:1.5;
+     font-size:11.8px;}}
+.page{{max-width:900px;margin:0 auto;background:{SURFACE};border:1px solid {HAIR};border-radius:16px;padding:24px 28px 20px;}}
 h1{{font-size:19px;font-weight:660;margin:0 0 3px;letter-spacing:-.01em;}}
 .sub{{font-size:11.5px;color:{MUTED};margin:0 0 16px;}}
 h2{{font-size:13px;font-weight:650;margin:13px 0 5px;padding-bottom:4px;
    border-bottom:1.5px solid {INK};letter-spacing:-.005em;}}
-.hero{{display:flex;align-items:baseline;gap:16px;background:#fafafa;
-      border-left:3px solid {TELCO_C};padding:12px 16px;margin-bottom:4px;}}
+.hero{{display:flex;align-items:baseline;gap:16px;background:{RAISED};
+      border-left:3px solid {TELCO_C};padding:14px 18px;margin-bottom:4px;
+      border-radius:0 10px 10px 0;}}
 .big{{font-size:31px;font-weight:680;color:{TELCO_C};letter-spacing:-.02em;
      line-height:1.1;white-space:nowrap;}}
 .big em{{font-style:normal;color:{CABLE_C};}}
@@ -146,7 +146,6 @@ code{{font-size:10.5px;background:#f0f0ee;padding:0 3px;border-radius:3px;}}
 .qrtext b{{color:{INK};}}
 .qrtext .u{{font-family:ui-monospace,monospace;font-size:10px;color:{MUTED};
            word-break:break-all;}}
-@media print{{ body{{background:#fff;}} .page{{padding:0;max-width:none;}} }}
 </style>
 <div class="page">
 

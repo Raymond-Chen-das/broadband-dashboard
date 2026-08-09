@@ -1,53 +1,52 @@
 <meta charset="utf-8">
 <title>專案摘要｜中華電信固網 2026 公開目標追蹤板</title>
 <style>
-@page { size: A4; margin: 10mm 11mm; }
 *{box-sizing:border-box;}
-body{margin:0;background:#f4f4f2;color:#0b0b0b;font-family:system-ui, -apple-system, "Segoe UI", "Microsoft JhengHei", sans-serif;line-height:1.5;
-     font-size:11.8px;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
-.page{max-width:900px;margin:0 auto;background:#fff;padding:24px 28px 20px;}
+body{margin:0;background:#dce9f3;color:#0d1f2d;font-family:system-ui, -apple-system, "Segoe UI", "Microsoft JhengHei", sans-serif;line-height:1.5;
+     font-size:11.8px;}
+.page{max-width:900px;margin:0 auto;background:#f2f8fc;border:1px solid rgba(20,54,84,0.14);border-radius:16px;padding:24px 28px 20px;}
 h1{font-size:19px;font-weight:660;margin:0 0 3px;letter-spacing:-.01em;}
-.sub{font-size:11.5px;color:#898781;margin:0 0 16px;}
+.sub{font-size:11.5px;color:#6b8299;margin:0 0 16px;}
 h2{font-size:13px;font-weight:650;margin:13px 0 5px;padding-bottom:4px;
-   border-bottom:1.5px solid #0b0b0b;letter-spacing:-.005em;}
-.hero{display:flex;align-items:baseline;gap:16px;background:#fafafa;
-      border-left:3px solid #2a78d6;padding:12px 16px;margin-bottom:4px;}
+   border-bottom:1.5px solid #0d1f2d;letter-spacing:-.005em;}
+.hero{display:flex;align-items:baseline;gap:16px;background:#e8f1f8;
+      border-left:3px solid #2a78d6;padding:14px 18px;margin-bottom:4px;
+      border-radius:0 10px 10px 0;}
 .big{font-size:31px;font-weight:680;color:#2a78d6;letter-spacing:-.02em;
      line-height:1.1;white-space:nowrap;}
 .big em{font-style:normal;color:#eb6834;}
-.heronote{font-size:11.8px;color:#52514e;}
+.heronote{font-size:11.8px;color:#3d5568;}
 .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin:11px 0 0;}
-.kpi{border:1px solid #e1e0d9;border-radius:7px;padding:9px 11px;}
+.kpi{border:1px solid rgba(20,54,84,0.10);border-radius:7px;padding:9px 11px;}
 .kpi .g{font-size:11.8px;font-weight:620;margin-bottom:4px;}
 .kpi .b{font-size:10.8px;font-weight:650;}
-.kpi .m{font-size:10.5px;color:#898781;margin-top:4px;line-height:1.5;}
-.warn .b{color:#b07500;} .crit .b{color:#b03030;}
-.warn{border-top:2.5px solid #b07500;} .crit{border-top:2.5px solid #b03030;}
+.kpi .m{font-size:10.5px;color:#6b8299;margin-top:4px;line-height:1.5;}
+.warn .b{color:#8a5a00;} .crit .b{color:#c0392b;}
+.warn{border-top:2.5px solid #8a5a00;} .crit{border-top:2.5px solid #c0392b;}
 table{border-collapse:collapse;width:100%;font-size:11.5px;margin-top:4px;}
-th,td{border-bottom:1px solid #e1e0d9;padding:6px 9px 6px 0;text-align:left;
+th,td{border-bottom:1px solid rgba(20,54,84,0.10);padding:6px 9px 6px 0;text-align:left;
       vertical-align:top;}
-th{color:#898781;font-weight:600;font-size:11px;}
+th{color:#6b8299;font-weight:600;font-size:11px;}
 td.req{font-weight:640;width:118px;}
-td.where{color:#898781;font-size:10.3px;width:186px;font-family:ui-monospace,monospace;}
+td.where{color:#6b8299;font-size:10.3px;width:186px;font-family:ui-monospace,monospace;}
 ul{margin:5px 0 0;padding-left:17px;} li{margin:3px 0;}
 .honest{background:#fbf9f4;border:1px solid #e6e0cf;border-radius:7px;
         padding:10px 14px;font-size:11.5px;}
-.honest b{color:#b03030;}
+.honest b{color:#c0392b;}
 code{font-size:10.5px;background:#f0f0ee;padding:0 3px;border-radius:3px;}
 .nums{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-top:6px;}
-.num{border:1px solid #e1e0d9;border-radius:7px;padding:8px 11px;}
+.num{border:1px solid rgba(20,54,84,0.10);border-radius:7px;padding:8px 11px;}
 .num .v{font-size:16px;font-weight:670;letter-spacing:-.01em;}
-.num .l{font-size:10.3px;color:#898781;margin-top:1px;line-height:1.45;}
-.foot{margin-top:16px;padding-top:9px;border-top:1px solid #e1e0d9;
-      font-size:10.3px;color:#898781;}
+.num .l{font-size:10.3px;color:#6b8299;margin-top:1px;line-height:1.45;}
+.foot{margin-top:16px;padding-top:9px;border-top:1px solid rgba(20,54,84,0.10);
+      font-size:10.3px;color:#6b8299;}
 .qrbar{display:flex;align-items:center;gap:14px;margin-top:14px;padding-top:11px;
-       border-top:1px solid #e1e0d9;}
+       border-top:1px solid rgba(20,54,84,0.10);}
 .qrbar img{width:74px;height:74px;flex:none;}
-.qrtext{font-size:11px;color:#52514e;line-height:1.55;}
-.qrtext b{color:#0b0b0b;}
-.qrtext .u{font-family:ui-monospace,monospace;font-size:10px;color:#898781;
+.qrtext{font-size:11px;color:#3d5568;line-height:1.55;}
+.qrtext b{color:#0d1f2d;}
+.qrtext .u{font-family:ui-monospace,monospace;font-size:10px;color:#6b8299;
            word-break:break-all;}
-@media print{ body{background:#fff;} .page{padding:0;max-width:none;} }
 </style>
 <div class="page">
 
@@ -80,7 +79,7 @@ code{font-size:10.5px;background:#f0f0ee;padding:0 3px;border-radius:3px;}
     <div class="b">✕ 追不到</div>
     <div class="m">純內部指標，無公開來源</div></div>
 </div>
-<p style="font-size:11.5px;color:#52514e;margin:9px 0 0;">
+<p style="font-size:11.5px;color:#3d5568;margin:9px 0 0;">
 「追不到」是本專案的內容，不是它的失敗——它同時說明三件事：知道貴公司在追什麼指標、
 知道公開資料的天花板在哪、知道需要哪些內部欄位才能補上。</p>
 

@@ -24,7 +24,7 @@ F_27953 = RAW / "ncc_27953_有線寬頻用戶數.csv"
 
 # ---------------------------------------------------------------------------
 # 契約：以 2026-08-08 的檔案快照釘住。欄位若變動，驗證即失敗——這正是契約的用途。
-# 來源：docs/prompt-build-broadband-dashboard.md 第一節 Ground Truth
+# 來源：logs/decisions.log 的 Ground Truth 自檢基準
 # ---------------------------------------------------------------------------
 
 COLS_7164 = [
@@ -233,7 +233,7 @@ def period_27953(row: dict[str, str]) -> tuple[int, int]:
 
 def main() -> int:
     print("階段 1：資料契約驗證（只驗證、不轉換、不寫入）")
-    print("依據：docs/10-project-spec.md 5.1、docs/prompt-build-broadband-dashboard.md 階段 1")
+    print("依據：docs/10-project-spec.md 5.1、logs/decisions.log 的預先登記表")
 
     check_file("7164", F_7164, COLS_7164, SUM_7164, period_7164)
     check_file("27953", F_27953, COLS_27953, SUM_27953, period_27953)

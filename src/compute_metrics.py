@@ -22,7 +22,7 @@ from dataclasses import dataclass
 
 from db import connect
 
-# Ground Truth（docs/prompt-build-broadband-dashboard.md 第 1.2 節）
+# Ground Truth（logs/decisions.log 第 1.2 節）
 GT = {
     "2019-01": dict(telco=4_296_061, cable=1_403_819, share=75.37),
     "2026-04": dict(telco=4_872_796, cable=2_469_678, share=66.36),

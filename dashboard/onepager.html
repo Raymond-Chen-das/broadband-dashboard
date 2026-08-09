@@ -40,6 +40,13 @@ code{font-size:10.5px;background:#f0f0ee;padding:0 3px;border-radius:3px;}
 .num .l{font-size:10.3px;color:#898781;margin-top:1px;line-height:1.45;}
 .foot{margin-top:16px;padding-top:9px;border-top:1px solid #e1e0d9;
       font-size:10.3px;color:#898781;}
+.qrbar{display:flex;align-items:center;gap:14px;margin-top:14px;padding-top:11px;
+       border-top:1px solid #e1e0d9;}
+.qrbar img{width:74px;height:74px;flex:none;}
+.qrtext{font-size:11px;color:#52514e;line-height:1.55;}
+.qrtext b{color:#0b0b0b;}
+.qrtext .u{font-family:ui-monospace,monospace;font-size:10px;color:#898781;
+           word-break:break-all;}
 @media print{ body{background:#fff;} .page{padding:0;max-width:none;} }
 </style>
 <div class="page">
@@ -97,6 +104,15 @@ code{font-size:10.5px;background:#f0f0ee;padding:0 3px;border-radius:3px;}
 
 <h2>我不宣稱的事</h2>
 <div class="honest"><ul><li><b>無 Teradata 實機經驗</b>——刻意未做 PI／skew 實驗。理由：被追問三層答不出來的展示，不放進交付物（<code>docs/20-db-experiments.md</code> 有完整說明）。</li><li><b>無生產環境 MLOps 經驗</b>——本專案的月更新管線是 DataOps，不是 MLOps，不作此宣稱。</li><li><b>本作品集刻意不含公文格式文件</b>——沒有人會把自己的數據作品集做成公文。為了命中 單一條款而扭曲作品形態，本身就是負面訊號。</li><li><b>本專案不含任何模型</b>——價值在約束與工程，不在演算法。</li></ul></div>
+
+<div class="qrbar">
+  <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzNyIgaGVpZ2h0PSIzNyIgY2xhc3M9InNlZ25vIj48cGF0aCBmaWxsPSIjZmZmIiBkPSJNMCAwaDM3djM3aC0zN3oiLz48cGF0aCBjbGFzcz0icXJsaW5lIiBzdHJva2U9IiMwYjBiMGIiIGQ9Ik0yIDIuNWg3bTEgMGgybTMgMGgybTEgMGgxbTEgMGgzbTIgMGgxbTIgMGg3bS0zMyAxaDFtNSAwaDFtMSAwaDFtMyAwaDJtOCAwaDNtMSAwaDFtNSAwaDFtLTMzIDFoMW0xIDBoM20xIDBoMW0yIDBoMm01IDBoMW0yIDBoMm0yIDBoMm0xIDBoMW0xIDBoM20xIDBoMW0tMzMgMWgxbTEgMGgzbTEgMGgxbTEgMGgzbTEgMGgxbTEgMGgxbTEgMGgybTEgMGgybTEgMGgzbTEgMGgxbTEgMGgzbTEgMGgxbS0zMyAxaDFtMSAwaDNtMSAwaDFtMyAwaDFtMSAwaDFtMSAwaDFtMiAwaDFtMSAwaDFtMSAwaDFtNCAwaDFtMSAwaDNtMSAwaDFtLTMzIDFoMW01IDBoMW0yIDBoMW0xIDBoMW0xIDBoMm0zIDBoNG00IDBoMW01IDBoMW0tMzMgMWg3bTEgMGgxbTEgMGgxbTEgMGgxbTEgMGgxbTEgMGgxbTEgMGgxbTEgMGgxbTEgMGgxbTEgMGgxbTEgMGg3bS0yNSAxaDNtNiAwaDFtMiAwaDFtMiAwaDJtLTI1IDFoMW0xIDBoMm0xIDBoM20xIDBoMm0xIDBoMW0xIDBoMW0xIDBoNG0xIDBoMW00IDBoMW0yIDBoMW0xIDBoMm0tMzMgMWgxbTIgMGgxbTYgMGgzbTMgMGgxbTEgMGgybTEgMGgxbTEgMGgxbTIgMGgybTEgMGgybTEgMGgxbS0yOSAxaDFtMSAwaDFtMyAwaDFtMSAwaDFtMSAwaDFtMiAwaDJtMSAwaDFtMSAwaDNtMSAwaDRtMSAwaDJtLTMxIDFoMm0xIDBoMW0zIDBoMW0yIDBoM201IDBoMW0xIDBoMW0xIDBoMW0yIDBoMW0xIDBoMW0tMzAgMWgxbTUgMGgybTMgMGgybTIgMGgxbTEgMGgzbTIgMGg0bTEgMGgzbTIgMGgxbS0zMyAxaDFtMiAwaDFtNCAwaDJtMyAwaDFtMiAwaDJtMSAwaDFtNCAwaDFtMiAwaDFtMiAwaDJtLTMyIDFoMW0xIDBoMW0xIDBoNW0yIDBoM20xIDBoMm0yIDBoMm01IDBoMm0xIDBoMm0tMzEgMWgxbTEgMGgxbTQgMGgybTEgMGgxbTEgMGgxbTMgMGgxbTIgMGgzbTEgMGgxbTEgMGgybTEgMGgxbTEgMGgxbS0zMSAxaDFtMiAwaDFtMSAwaDNtMSAwaDJtMSAwaDVtMSAwaDRtMyAwaDJtMSAwaDNtLTMwIDFoMm0yIDBoMW0yIDBoMm0yIDBoNG0xIDBoMm0xIDBoMW0xIDBoM20xIDBoMW0xIDBoMm0xIDBoMm0tMzMgMWg3bTIgMGgybTMgMGg0bTIgMGgybTMgMGgxbTEgMGgybTEgMGgybS0zMiAxaDJtMSAwaDFtMyAwaDJtMyAwaDFtNCAwaDJtMyAwaDJtMiAwaDFtMSAwaDFtLTI3IDFoMm0yIDBoM20xIDBoM20xIDBoMm0zIDBoMW0xIDBoMW0xIDBoMW01IDBoMm0xIDBoMW0tMzMgMWgxbTIgMGgzbTEgMGg0bTIgMGgxbTEgMGgxbTIgMGgzbTEgMGgybTIgMGgxbTIgMGgxbTIgMGgxbS0yOSAxaDRtMiAwaDFtMSAwaDNtMSAwaDFtMyAwaDFtMSAwaDNtMSAwaDFtMSAwaDFtMSAwaDNtLTMyIDFoMW0zIDBoMW0xIDBoMW0xIDBoM20xIDBoMW0yIDBoMW0xIDBoMW02IDBoMm0xIDBoMm0yIDBoMW0tMzMgMWgxbTEgMGgzbTEgMGgybTEgMGg3bTEgMGgybTMgMGgxbTEgMGg1bTIgMGgxbS0yNCAxaDNtMSAwaDFtMSAwaDRtMSAwaDFtNCAwaDFtMyAwaDJtLTMwIDFoN20xIDBoMm0xIDBoMW0yIDBoMW00IDBoMW0xIDBoNG0xIDBoMW0xIDBoMW0yIDBoMW0tMzIgMWgxbTUgMGgxbTEgMGgxbTEgMGgxbTIgMGgxbTIgMGgxbTEgMGgxbTIgMGg0bTMgMGgzbTEgMGgxbS0zMyAxaDFtMSAwaDNtMSAwaDFtMiAwaDJtMSAwaDFtMSAwaDFtMiAwaDFtMSAwaDEwbTEgMGgxbTEgMGgxbS0zMyAxaDFtMSAwaDNtMSAwaDFtMSAwaDFtMSAwaDFtMSAwaDFtMSAwaDFtMiAwaDFtMiAwaDFtMSAwaDJtMyAwaDFtNCAwaDFtLTMzIDFoMW0xIDBoM20xIDBoMW0xIDBoMW0yIDBoNG0yIDBoMW02IDBoMW0xIDBoMm0tMjggMWgxbTUgMGgxbTIgMGgxbTIgMGgxbTEgMGg0bTIgMGgxbTEgMGgzbTEgMGgzbTMgMGgxbS0zMyAxaDdtMSAwaDJtMSAwaDFtMiAwaDVtMiAwaDFtMSAwaDFtMSAwaDJtMSAwaDMiLz48L3N2Zz4K" alt="QR code，開啟線上互動看板">
+  <div class="qrtext">
+    <b>掃描開啟線上互動看板</b>——完整的陣營消長主圖（可縮放、可查每月數值）、
+    四張目標可追蹤性卡片、以及方法說明頁（含接合校驗與四種識別策略被否決的理由）。<br>
+    <span class="u">https://raymond-chen-das.github.io/broadband-dashboard/</span>
+  </div>
+</div>
 
 <p class="foot">
 判準於看資料前寫死並存檔（<code>logs/decisions.log</code>，append-only）；

@@ -16,12 +16,33 @@
 
 from __future__ import annotations
 
+import io
 from pathlib import Path
+
+import segno
 
 from compute_metrics import fetch_metrics
 
 ROOT = Path(__file__).resolve().parent.parent
 OUT = ROOT / "dashboard"
+
+# QR 目標＝Pages 的看板頁，**不是 repo 首頁**。掃碼的人要的是圖，不是程式碼。
+PAGES_URL = "https://raymond-chen-das.github.io/broadband-dashboard/"
+
+
+def qr_svg_data_uri(url: str) -> str:
+    """回傳可直接放進 <img src> 的 SVG data URI。
+
+    用 SVG 而非 PNG：這份摘要會被列印成 PDF，向量碼在紙上與螢幕上都不會糊，
+    而糊掉的 QR 就是掃不到的 QR。
+    error='m' 容錯約 15%，足以容忍列印與翻拍的損耗。
+    """
+    buf = io.BytesIO()
+    segno.make(url, error="m").save(buf, kind="svg", scale=1, border=2,
+                                    dark="#0b0b0b", light="#ffffff", xmldecl=False)
+    import base64
+    b64 = base64.b64encode(buf.getvalue()).decode("ascii")
+    return f"data:image/svg+xml;base64,{b64}"
 
 TELCO_C, CABLE_C = "#2a78d6", "#eb6834"
 INK, INK2, MUTED = "#0b0b0b", "#52514e", "#898781"
@@ -118,6 +139,13 @@ code{{font-size:10.5px;background:#f0f0ee;padding:0 3px;border-radius:3px;}}
 .num .l{{font-size:10.3px;color:{MUTED};margin-top:1px;line-height:1.45;}}
 .foot{{margin-top:16px;padding-top:9px;border-top:1px solid {GRID};
       font-size:10.3px;color:{MUTED};}}
+.qrbar{{display:flex;align-items:center;gap:14px;margin-top:14px;padding-top:11px;
+       border-top:1px solid {GRID};}}
+.qrbar img{{width:74px;height:74px;flex:none;}}
+.qrtext{{font-size:11px;color:{INK2};line-height:1.55;}}
+.qrtext b{{color:{INK};}}
+.qrtext .u{{font-family:ui-monospace,monospace;font-size:10px;color:{MUTED};
+           word-break:break-all;}}
 @media print{{ body{{background:#fff;}} .page{{padding:0;max-width:none;}} }}
 </style>
 <div class="page">
@@ -175,6 +203,15 @@ code{{font-size:10.5px;background:#f0f0ee;padding:0 3px;border-radius:3px;}}
 
 <h2>我不宣稱的事</h2>
 <div class="honest"><ul>{nc}</ul></div>
+
+<div class="qrbar">
+  <img src="{qr_svg_data_uri(PAGES_URL)}" alt="QR code，開啟線上互動看板">
+  <div class="qrtext">
+    <b>掃描開啟線上互動看板</b>——完整的陣營消長主圖（可縮放、可查每月數值）、
+    四張目標可追蹤性卡片、以及方法說明頁（含接合校驗與四種識別策略被否決的理由）。<br>
+    <span class="u">{PAGES_URL}</span>
+  </div>
+</div>
 
 <p class="foot">
 判準於看資料前寫死並存檔（<code>logs/decisions.log</code>，append-only）；

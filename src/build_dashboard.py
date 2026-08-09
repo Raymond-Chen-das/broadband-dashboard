@@ -140,9 +140,11 @@ def main_figure(rows) -> go.Figure:
     for when, label in BREAKS:
         fig.add_vline(x=when, line=dict(color=BREAK_C, width=1.2, dash="dash"),
                       layer="below")
+        # 11.5px 不是美感選擇：手機上圖在捲動容器裡是原尺寸顯示，
+        # 10.5px 在小螢幕上是勉強可讀的邊緣值，而這是圖上最需要被讀到的警語。
         fig.add_annotation(x=when, y=0.0, yref="y domain", text=f"⚠ 資料斷點 {label}",
                            showarrow=False, yshift=14, xshift=3, xanchor="left",
-                           font=dict(size=10.5, color=BREAK_C), row=1, col=1)
+                           font=dict(size=11.5, color=BREAK_C), row=1, col=1)
 
     fig.update_xaxes(showgrid=False, zeroline=False, linecolor=AXIS,
                      ticks="outside", tickcolor=AXIS, ticklen=4,
@@ -181,7 +183,7 @@ def mock_figure() -> go.Figure:
                   row=1, col=1)
     fig.add_hline(y=50, line=dict(color=MUTED, width=1, dash="dot"), row=1, col=1)
     fig.add_annotation(x=months[0], y=50, text="目標 50%", showarrow=False, yshift=10,
-                       xanchor="left", font=dict(size=10.5, color=MUTED), row=1, col=1)
+                       xanchor="left", font=dict(size=11.5, color=MUTED), row=1, col=1)
     fig.add_trace(go.Scatter(x=months, y=[54.0, 55.8, 57.9, 59.6, 61.2, 62.8],
                              mode="lines+markers", line=dict(color=CABLE_C, width=2),
                              marker=dict(size=8), name="Wi-Fi 全屋滲透",
@@ -190,7 +192,7 @@ def mock_figure() -> go.Figure:
                   row=1, col=2)
     fig.add_hline(y=65, line=dict(color=MUTED, width=1, dash="dot"), row=1, col=2)
     fig.add_annotation(x=months[0], y=65, text="目標 65%", showarrow=False, yshift=10,
-                       xanchor="left", font=dict(size=10.5, color=MUTED), row=1, col=2)
+                       xanchor="left", font=dict(size=11.5, color=MUTED), row=1, col=2)
     fig.update_xaxes(showgrid=False, linecolor=AXIS, tickfont=dict(size=11, color=MUTED))
     fig.update_yaxes(showgrid=True, gridcolor=GRID, ticksuffix="%",
                      linecolor=AXIS, tickfont=dict(size=11, color=MUTED))
@@ -213,7 +215,13 @@ h2{{font-size:19px;font-weight:640;margin:52px 0 8px;letter-spacing:-.01em;}}
 h3{{font-size:14.5px;font-weight:640;margin:22px 0 6px;}}
 .lede{{font-size:15px;color:{INK2};margin:0 0 4px;}}
 .card{{background:{SURFACE};border:1px solid rgba(11,11,11,.10);border-radius:11px;
-      padding:10px 10px 6px;margin-top:18px;}}
+      padding:10px 10px 6px;margin-top:18px;
+      /* 圖表在自己的容器裡橫向捲動，頁面本體永不橫向捲動。
+         在 375px 手機上把兩格子圖硬壓進去，軸標籤會擠成看不懂的東西——
+         給最小寬度讓使用者左右滑，比壓扁誠實。 */
+      overflow-x:auto;-webkit-overflow-scrolling:touch;}}
+.card > div{{min-width:700px;}}
+.scrollhint{{display:none;font-size:11.5px;color:{MUTED};margin:6px 2px 0;}}
 .hero{{background:{SURFACE};border:1px solid rgba(11,11,11,.10);border-radius:11px;
       padding:22px 26px;margin:20px 0 0;}}
 .figure{{font-size:44px;font-weight:680;letter-spacing:-.02em;color:{TELCO_C};line-height:1.15;}}
@@ -248,6 +256,26 @@ th,td{{border-bottom:1px solid {GRID};padding:7px 12px 7px 0;text-align:left;ver
 th{{color:{MUTED};font-weight:600;}}
 code{{font-size:12px;background:rgba(11,11,11,.05);padding:1px 5px;border-radius:4px;}}
 .foot{{font-size:12px;color:{MUTED};margin-top:44px;padding-top:16px;border-top:1px solid {GRID};}}
+
+/* ── 行動裝置（QR 掃進來的主要情境）──────────────────────────────
+   375px（iPhone SE）／390px（iPhone 14）實測後加入。
+   先前所有碰撞檢查只跑 900／1100／1400px，完全沒涵蓋這一段。 */
+@media (max-width: 640px) {{
+  .wrap {{ padding: 22px 14px 56px; }}
+  h1 {{ font-size: 22px; }}
+  h2 {{ font-size: 17px; margin-top: 38px; }}
+  .lede {{ font-size: 14px; }}
+  .hero {{ padding: 16px 16px; }}
+  .figure {{ font-size: 30px; }}
+  .figure small {{ display: block; margin-top: 4px; font-size: 14px; }}
+  .scrollhint {{ display: block; }}
+  .kpis {{ grid-template-columns: 1fr; }}
+  .limits {{ padding: 12px 14px; }}
+  .mockwrap {{ padding: 6px 8px 8px; }}
+  table {{ font-size: 12px; }}
+  /* 長字串（URL、路徑）在窄螢幕會把版面撐開 */
+  code {{ word-break: break-all; }}
+}}
 """
 
 # 規格 7.1：方法說明頁的完整區塊。**預先寫死，不得臨場改寫，不得刪減任何一條。**
@@ -298,7 +326,9 @@ def build(rows) -> str:
     # 塞 56MB 的新 blob，而其中 99% 是每次都一樣的函式庫。
     # 外部引用同樣可離線開啟（只要 plotly.min.js 跟著同一個資料夾）。
     # 要寄出或單獨上傳的單一檔版本，用 `--inline` 產生。
-    opts = dict(full_html=False, config={"displayModeBar": False})
+    # responsive: True 是 QR 掃進來的必要條件——沒有它，Plotly 把寬度釘在
+    # 產生當下的值，手機上就是一張切一半的圖。（先前只設了 displayModeBar。）
+    opts = dict(full_html=False, config={"displayModeBar": False, "responsive": True})
     js = True if INLINE else "directory"
     fig_main = main_figure(rows).to_html(include_plotlyjs=js, **opts)
     fig_mock = mock_figure().to_html(include_plotlyjs=False, **opts)
@@ -323,6 +353,7 @@ def build(rows) -> str:
 </div>
 
 <div class="card">{fig_main}</div>
+<p class="scrollhint">← 圖表可左右滑動</p>
 
 <div class="limits">
   <b>這張圖的三個限制（不放附錄，就寫在圖旁）</b>

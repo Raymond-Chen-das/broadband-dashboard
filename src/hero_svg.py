@@ -3,6 +3,12 @@
 不是「大數字＋標籤＋漸層」那種模板解。這裡畫的是兩條陣營占比軌跡，
 以及它們之間**逐年收窄的缺口**——那個缺口就是標題說的 9 個百分點。
 資料與主圖同源，不是裝飾用的假曲線。
+
+2026-08-09 改版：整份看板由深色機殼改為冷靛藍紙。深色底的兩項設定在淺底
+會失效——發光濾鏡在淺底變成髒污的暈圈，缺口填色的 .30 不透明度在淺底過重
+而蓋掉線本身。因此：移除 glow，缺口填色降階，錨線改為深色系。
+另外補上 ``xmlns``：這份 SVG 目前內嵌於 HTML，沒有命名空間也能顯示，
+但只要有人把它另存為 .svg 以 <img> 引用就會整張失效。補上不花成本。
 """
 from __future__ import annotations
 
@@ -43,32 +49,22 @@ def hero_svg(rows, telco_c: str, cable_c: str, anchor_ym: str = "",
             ay_t, ay_c = pt(idx, share[idx])[1], pt(idx, 100 - share[idx])[1]
             mark = (
                 f'<line x1="{ax:.1f}" y1="0" x2="{ax:.1f}" y2="{h}" '
-                f'stroke="rgba(220,234,242,.34)" stroke-width="1" '
+                f'stroke="rgba(19,24,34,.28)" stroke-width="1" '
                 f'stroke-dasharray="3 4" vector-effect="non-scaling-stroke"/>'
                 f'<circle cx="{ax:.1f}" cy="{ay_t:.1f}" r="3.5" fill="{telco_c}"/>'
                 f'<circle cx="{ax:.1f}" cy="{ay_c:.1f}" r="3.5" fill="{cable_c}"/>')
 
-    # 深場上兩條線會發光。缺口填色從左邊亮、往右淡，
-    # 讓「收窄」不只靠形狀，也靠明度被讀出來。
-    return f"""<svg class="herofig" viewBox="0 0 {w} {h}" preserveAspectRatio="none"
+    # 缺口填色從左邊深、往右淡，讓「收窄」不只靠形狀，也靠明度被讀出來。
+    return f"""<svg xmlns="http://www.w3.org/2000/svg" class="herofig"
+     viewBox="0 0 {w} {h}" preserveAspectRatio="none"
      aria-hidden="true" focusable="false">
   <defs>
     <linearGradient id="gapfill" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0" stop-color="{telco_c}" stop-opacity=".30"/>
-      <stop offset="1" stop-color="{telco_c}" stop-opacity=".04"/>
+      <stop offset="0" stop-color="{telco_c}" stop-opacity=".16"/>
+      <stop offset="1" stop-color="{telco_c}" stop-opacity=".02"/>
     </linearGradient>
-    <filter id="glow" x="-6%" y="-30%" width="112%" height="160%">
-      <feGaussianBlur stdDeviation="5" result="b"/>
-      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
-    </filter>
   </defs>
   <path d="{gap}" fill="url(#gapfill)"/>
-  <g filter="url(#glow)" opacity=".55">
-    <path d="{path(telco)}" fill="none" stroke="{telco_c}" stroke-width="2.4"
-          vector-effect="non-scaling-stroke"/>
-    <path d="{path(cable)}" fill="none" stroke="{cable_c}" stroke-width="2.4"
-          vector-effect="non-scaling-stroke"/>
-  </g>
   {mark}
   <path d="{path(telco)}" fill="none" stroke="{telco_c}" stroke-width="2.2"
         vector-effect="non-scaling-stroke"/>

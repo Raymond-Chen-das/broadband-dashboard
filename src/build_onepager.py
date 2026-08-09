@@ -8,6 +8,8 @@
 
 **所有數字由資料算出，不得寫死**——與看板同一份 metrics 來源。
 
+視覺與看板同一套系統（冷靛藍紙、IBM Plex ＋ Noto Sans TC、近白卡片）。
+
 用法：
     .\\.venv\\Scripts\\python.exe src\\build_onepager.py
 """
@@ -31,57 +33,71 @@ PAGES_URL = "https://raymond-chen-das.github.io/broadband-dashboard/"
 def qr_svg_data_uri(url: str) -> str:
     """回傳可直接放進 <img src> 的 SVG data URI。
 
-    用 SVG 而非 PNG：這份摘要會被列印成 PDF，向量碼在紙上與螢幕上都不會糊，
-    而糊掉的 QR 就是掃不到的 QR。
+    用 SVG 而非 PNG：向量碼在紙上與螢幕上都不會糊，而糊掉的 QR 就是掃不到的 QR。
     error='m' 容錯約 15%，足以容忍列印與翻拍的損耗。
     """
     buf = io.BytesIO()
     segno.make(url, error="m").save(buf, kind="svg", scale=1, border=2,
-                                    dark="#0b0b0b", light="#ffffff", xmldecl=False)
+                                    dark="#131822", light="#ffffff", xmldecl=False)
     import base64
     b64 = base64.b64encode(buf.getvalue()).decode("ascii")
     return f"data:image/svg+xml;base64,{b64}"
 
-TELCO_C, CABLE_C = "#2a78d6", "#eb6834"
-PLANE, SURFACE, RAISED = "#dce9f3", "#f2f8fc", "#e8f1f8"
-HAIR = "rgba(20,54,84,0.14)"
-INK, INK2, MUTED = "#0d1f2d", "#3d5568", "#6b8299"
-GRID, WARN, CRIT = "rgba(20,54,84,0.10)", "#8a5a00", "#c0392b"
-FONT = 'system-ui, -apple-system, "Segoe UI", "Microsoft JhengHei", sans-serif'
+
+ACCENT, ACCENT_D = "#4a56c9", "#333db3"
+PAPER, PAPER2, CARD = "#e9ecf7", "#dfe3f2", "#f6f8fd"
+SHELL = "#e5e7ee"
+INK, INK2, MUTED, MUTED2 = "#131822", "#4c5666", "#8b94a3", "#7c8695"
+RULE, RULE_D = "rgba(19,24,34,.09)", "rgba(19,24,34,.16)"
+WARN, WARN_BG = "#a05a18", "#f6f0e8"
+CRIT = "#c0483c"
+CRIT_D = "#a83a2e"
+SANS = ("'IBM Plex Sans', 'Noto Sans TC', system-ui, -apple-system, "
+        "'Segoe UI', 'Microsoft JhengHei', sans-serif")
+MONO = ("'IBM Plex Mono', 'Noto Sans TC', ui-monospace, 'Cascadia Mono', "
+        "'SF Mono', Consolas, monospace")
+FONTS_HREF = ("https://fonts.googleapis.com/css2?"
+              "family=IBM+Plex+Sans:wght@400;500;600"
+              "&family=IBM+Plex+Mono:wght@400;500;600"
+              "&family=Noto+Sans+TC:wght@300;400;500;700&display=swap")
+
+BYLINE = "陳嘉翔"
 
 # 條件對照：只列**本專案真的產出了證據**的項目。
 # 「公文撰寫」一條刻意不列——沒做就是沒做，補一份假的正是本專案要避免的失分方式。
 EVIDENCE = [
     ("熟悉資料庫操作",
      "PostgreSQL 17 星型 schema、冪等 upsert（逐列 md5 驗證）、"
-     "SQL 視窗函數計算全部指標、查詢調校（Seq Scan → Index Only Scan，buffers 16,604 → 409）、"
-     "索引寫入代價實測",
-     "src/load_postgres.py｜src/compute_metrics.py｜docs/20-db-experiments.md"),
+     "以 SQL 視窗函數計算全部指標、查詢調校"
+     "（Seq Scan 改為 Index Only Scan，buffers 16,604 降到 409）、索引寫入代價實測",
+     "src/load_postgres.py<br>src/compute_metrics.py<br>docs/20-db-experiments.md"),
     ("資料分析與統計方法",
-     "判準看資料前寫死並存檔（append-only）、兩來源接合校驗（60 筆零差異）、"
+     "判準於檢視資料前固定並存檔（append-only）、兩來源接合校驗 60 筆零差異、"
      "四種因果識別策略逐一否決並寫明理由、限制章節六條",
-     "logs/decisions.log｜docs/30-splice-validation-report.md"),
+     "logs/decisions.log<br>docs/30-splice-validation-report.md"),
     ("資料處理與品質控管",
-     "16 項資料契約驗證（欄位、型別、算術、連續性、期間），契約不過即擋、不得先跑跑看；"
-     "22 項自動化測試把 Ground Truth 編碼為回歸測試",
-     "src/validate_contracts.py｜tests/test_pipeline.py"),
+     "16 項資料契約驗證（欄位、型別、算術、連續性、期間），"
+     "任一項未通過即中止後續所有階段；22 項自動化測試將 Ground Truth 編碼為回歸測試",
+     "src/validate_contracts.py<br>tests/test_pipeline.py"),
     ("視覺化與溝通",
-     "單頁離線 HTML 看板；調色盤經色覺驗證器檢查（明暗兩模式全通過）；"
-     "限制寫在圖旁而非附錄；未達成的指標明確標示為「追不到」而非省略",
-     "dashboard/index.html｜src/build_dashboard.py"),
+     "單頁離線 HTML 看板；調色盤經色覺驗證器檢查；限制敘述置於圖側而非附錄；"
+     "不可追蹤的指標明確標示，不予省略",
+     "dashboard/index.html<br>src/build_dashboard.py"),
     ("專案成效追蹤（可持續運行）",
-     "月更新管線：data.gov.tw 兩段式取用 → 契約驗證 → 缺月偵測 → 冪等 upsert → 重生看板；"
-     "已對真實新月份端到端實跑成功",
-     "src/update_monthly.py｜logs/update-runs.log"),
+     "月更新管線：data.gov.tw 兩段式取用、契約驗證、缺月偵測、冪等 upsert、重生看板。"
+     "已針對真實的新月份完成端到端實跑",
+     "src/update_monthly.py<br>logs/update-runs.log"),
 ]
 
 NOT_CLAIMED = [
-    "<b>無 Teradata 實機經驗</b>——刻意未做 PI／skew 實驗。理由：被追問三層答不出來的展示，"
-    "不放進交付物（<code>docs/20-db-experiments.md</code> 有完整說明）。",
-    "<b>無生產環境 MLOps 經驗</b>——本專案的月更新管線是 DataOps，不是 MLOps，不作此宣稱。",
-    "<b>本作品集刻意不含公文格式文件</b>——沒有人會把自己的數據作品集做成公文。"
-    "為了命中 單一條款而扭曲作品形態，本身就是負面訊號。",
-    "<b>本專案不含任何模型</b>——價值在約束與工程，不在演算法。",
+    ("沒有 Teradata 實機經驗。",
+     "刻意未進行 PI 與 skew 實驗；無法承受三層追問的展示不納入交付物"
+     "（<code>docs/20-db-experiments.md</code> 有完整說明）。"),
+    ("沒有生產環境的 MLOps 經驗。",
+     "本專案的月更新管線屬 DataOps 而非 MLOps，故不作此宣稱。"),
+    ("刻意不含公文格式文件。",
+     "為迎合 單一條款而扭曲作品形態，本身即為負面訊號。"),
+    ("不含任何模型。", "價值在約束與工程，不在演算法。"),
 ]
 
 
@@ -95,99 +111,141 @@ def build(rows) -> str:
         f"<tr><td class='req'>{req}</td><td>{what}</td>"
         f"<td class='where'>{where}</td></tr>"
         for req, what, where in EVIDENCE)
-    nc = "".join(f"<li>{x}</li>" for x in NOT_CLAIMED)
+    nc = "".join(f"<div class='nc'><b>{h}</b>{t}</div>" for h, t in NOT_CLAIMED)
 
     return f"""<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>專案摘要｜中華電信固網 2026 公開目標追蹤板</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="{FONTS_HREF}" rel="stylesheet">
 <style>
 *{{box-sizing:border-box;}}
-body{{margin:0;background:{PLANE};color:{INK};font-family:{FONT};line-height:1.5;
-     font-size:11.8px;}}
-.page{{max-width:900px;margin:0 auto;background:{SURFACE};border:1px solid {HAIR};border-radius:16px;padding:24px 28px 20px;}}
-h1{{font-size:19px;font-weight:660;margin:0 0 3px;letter-spacing:-.01em;}}
-.sub{{font-size:11.5px;color:{MUTED};margin:0 0 16px;}}
-h2{{font-size:13px;font-weight:650;margin:13px 0 5px;padding-bottom:4px;
-   border-bottom:1.5px solid {INK};letter-spacing:-.005em;}}
-.hero{{display:flex;align-items:baseline;gap:16px;background:{RAISED};
-      border-left:3px solid {TELCO_C};padding:14px 18px;margin-bottom:4px;
-      border-radius:0 10px 10px 0;}}
-.big{{font-size:31px;font-weight:680;color:{TELCO_C};letter-spacing:-.02em;
-     line-height:1.1;white-space:nowrap;}}
-.big em{{font-style:normal;color:{CABLE_C};}}
-.heronote{{font-size:11.8px;color:{INK2};}}
-.grid{{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin:11px 0 0;}}
-.kpi{{border:1px solid {GRID};border-radius:7px;padding:9px 11px;}}
-.kpi .g{{font-size:11.8px;font-weight:620;margin-bottom:4px;}}
-.kpi .b{{font-size:10.8px;font-weight:650;}}
-.kpi .m{{font-size:10.5px;color:{MUTED};margin-top:4px;line-height:1.5;}}
-.warn .b{{color:{WARN};}} .crit .b{{color:{CRIT};}}
-.warn{{border-top:2.5px solid {WARN};}} .crit{{border-top:2.5px solid {CRIT};}}
-table{{border-collapse:collapse;width:100%;font-size:11.5px;margin-top:4px;}}
-th,td{{border-bottom:1px solid {GRID};padding:6px 9px 6px 0;text-align:left;
-      vertical-align:top;}}
-th{{color:{MUTED};font-weight:600;font-size:11px;}}
-td.req{{font-weight:640;width:118px;}}
-td.where{{color:{MUTED};font-size:10.3px;width:186px;font-family:ui-monospace,monospace;}}
-ul{{margin:5px 0 0;padding-left:17px;}} li{{margin:3px 0;}}
-.honest{{background:#fbf9f4;border:1px solid #e6e0cf;border-radius:7px;
-        padding:10px 14px;font-size:11.5px;}}
-.honest b{{color:{CRIT};}}
-code{{font-size:10.5px;background:#f0f0ee;padding:0 3px;border-radius:3px;}}
-.nums{{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-top:6px;}}
-.num{{border:1px solid {GRID};border-radius:7px;padding:8px 11px;}}
-.num .v{{font-size:16px;font-weight:670;letter-spacing:-.01em;}}
-.num .l{{font-size:10.3px;color:{MUTED};margin-top:1px;line-height:1.45;}}
-.foot{{margin-top:16px;padding-top:9px;border-top:1px solid {GRID};
-      font-size:10.3px;color:{MUTED};}}
-.qrbar{{display:flex;align-items:center;gap:14px;margin-top:14px;padding-top:11px;
-       border-top:1px solid {GRID};}}
-.qrbar img{{width:74px;height:74px;flex:none;}}
-.qrtext{{font-size:11px;color:{INK2};line-height:1.55;}}
-.qrtext b{{color:{INK};}}
-.qrtext .u{{font-family:ui-monospace,monospace;font-size:10px;color:{MUTED};
-           word-break:break-all;}}
+body{{margin:0;background:{SHELL};color:{INK};font-family:{SANS};line-height:1.72;
+     -webkit-font-smoothing:antialiased;padding:44px 24px 80px;}}
+.page{{max-width:1000px;margin:0 auto;background:{PAPER};
+      border:1px solid {RULE};border-radius:16px;padding:48px 52px 40px;
+      box-shadow:0 1px 2px rgba(19,24,34,.04),0 30px 70px -40px rgba(19,24,34,.45);}}
+
+.head{{display:flex;align-items:flex-start;justify-content:space-between;gap:40px;
+     padding-bottom:22px;border-bottom:1px solid rgba(19,24,34,.14);}}
+.eyebrow{{display:block;font-family:{MONO};font-size:10px;letter-spacing:.24em;
+        text-transform:uppercase;color:{ACCENT};font-weight:500;margin-bottom:10px;}}
+h1{{font-size:29px;font-weight:600;letter-spacing:-.03em;margin:0 0 8px;line-height:1.25;}}
+.sub{{font-size:12.5px;color:{MUTED};margin:0;}}
+.qr{{width:78px;height:78px;flex:none;border:1px solid rgba(19,24,34,.10);
+   border-radius:8px;padding:4px;background:#fdfdff;}}
+
+.hero{{display:flex;align-items:center;gap:28px;background:{PAPER2};
+     border-radius:12px;padding:24px 28px;margin-top:22px;}}
+.big{{font-family:{MONO};font-size:40px;font-weight:500;letter-spacing:-.045em;
+    line-height:1;white-space:nowrap;color:{ACCENT};}}
+.big .arrow{{color:#b9bed4;}} .big em{{font-style:normal;color:{INK};}}
+.heronote{{font-size:13.5px;color:{INK2};border-left:1px solid rgba(19,24,34,.14);
+         padding-left:26px;}}
+.heronote b{{color:{INK};font-weight:500;}}
+
+h2{{font-size:16px;font-weight:500;letter-spacing:-.01em;margin:32px 0 14px;
+   padding-bottom:9px;border-bottom:1px solid {RULE_D};}}
+
+.grid{{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}}
+.kpi{{background:{CARD};border:1px solid rgba(19,24,34,.10);border-radius:10px;
+    padding:14px 16px;transition:transform .25s ease,border-color .25s ease;}}
+.kpi:hover{{transform:translateY(-2px);border-color:rgba(19,24,34,.18);}}
+.kpi.warn{{border-top:2px solid {ACCENT};}}
+.kpi.crit{{border-top:2px solid {CRIT};}}
+.kpi .g{{font-size:13.5px;font-weight:500;margin-bottom:8px;}}
+.kpi .b{{font-family:{MONO};font-size:10.5px;font-weight:500;}}
+.kpi.warn .b{{color:{ACCENT};}} .kpi.crit .b{{color:{CRIT_D};}}
+.kpi .m{{font-size:12px;color:{MUTED};margin-top:7px;line-height:1.6;}}
+.after{{font-size:13px;color:{INK2};margin:14px 0 0;}}
+.after b{{color:{INK};font-weight:500;}}
+
+.nums{{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}}
+.num{{background:{PAPER2};border-radius:10px;padding:14px 16px;}}
+.num .v{{font-family:{MONO};font-size:20px;font-weight:500;letter-spacing:-.02em;
+       font-variant-numeric:tabular-nums;}}
+.num .l{{font-size:11.5px;color:{MUTED2};margin-top:4px;line-height:1.55;}}
+
+table{{border-collapse:collapse;width:100%;font-size:12.5px;}}
+th{{text-align:left;font-family:{MONO};font-size:10px;letter-spacing:.14em;
+   text-transform:uppercase;color:#98a0ad;font-weight:500;padding:10px 14px 8px 0;}}
+td{{padding:10px 14px 10px 0;border-top:1px solid rgba(19,24,34,.08);
+   vertical-align:top;color:{INK2};}}
+tbody tr:hover,tr:hover{{background:rgba(19,24,34,.035);}}
+td.req{{font-weight:500;color:{INK};width:130px;}}
+td.where{{font-family:{MONO};font-size:10.5px;color:#98a0ad;width:190px;}}
+th:last-child,td:last-child{{padding-right:0;}}
+
+.honest{{background:{WARN_BG};border:1px solid rgba(160,90,24,.20);border-radius:10px;
+       padding:16px 20px;display:flex;flex-direction:column;gap:9px;}}
+.nc{{font-size:12.8px;color:{INK2};}}
+.nc b{{color:{WARN};font-weight:500;}}
+code{{font-family:{MONO};font-size:11.5px;background:rgba(19,24,34,.06);
+    padding:2px 6px;border-radius:4px;color:{INK2};}}
+
+.qrbar{{margin-top:24px;padding-top:16px;border-top:1px solid {RULE};}}
+.qrtext{{font-size:12.5px;color:{INK2};}}
+.qrtext b{{color:{INK};font-weight:500;}}
+.qrtext .u{{font-family:{MONO};font-size:10.5px;color:{MUTED};word-break:break-all;}}
+
+.foot{{margin:22px 0 0;padding-top:14px;border-top:1px solid {RULE};
+     font-family:{MONO};font-size:10.5px;line-height:1.9;color:#98a0ad;}}
+a{{color:{ACCENT};text-decoration:none;border-bottom:1px solid rgba(74,86,201,.28);}}
+a:hover{{color:{ACCENT_D};border-bottom-color:{ACCENT_D};}}
+@media (max-width:900px){{
+  .page{{padding:32px 24px;}}
+  .grid,.nums{{grid-template-columns:1fr 1fr;}}
+  .hero{{flex-direction:column;align-items:flex-start;gap:14px;}}
+  .heronote{{border-left:0;padding-left:0;}}
+}}
 </style>
 <div class="page">
 
-<h1>中華電信固網 2026 公開目標追蹤板</h1>
-<p class="sub">外部求職者以公開資料製作　·　資料來源：NCC／data.gov.tw
-（{rows[0].ym} ~ {z.ym}，月頻率）　·
-非中華電信內部文件，不代表該公司立場</p>
+<div class="head">
+  <div>
+    <span class="eyebrow">專案摘要 / 01　·　{BYLINE}</span>
+    <h1>中華電信固網 2026 公開目標追蹤板</h1>
+    <p class="sub">外部求職者以公開資料製作　·　NCC／data.gov.tw
+    （{rows[0].ym} 到 {z.ym}，月頻率）　·　非中華電信內部文件</p>
+  </div>
+  <img class="qr" src="{qr_svg_data_uri(PAGES_URL)}" alt="QR code，開啟線上互動看板">
+</div>
 
 <div class="hero">
-  <div class="big">{a.telco_share:.1f}% → <em>{z.telco_share:.1f}%</em></div>
+  <div class="big">{a.telco_share:.1f}% <span class="arrow">→</span>
+    <em>{z.telco_share:.1f}%</em></div>
   <div class="heronote">
     台灣固網寬頻，<b>電信陣營占比 {years} 年下降 {abs(delta):.2f} 個百分點</b>。
-    政府公開統計、可驗證。<br>
-    這是<b>技術陣營層級的代理指標</b>，不是中華電信自身市占——公開統計無業者別。
+    資料取自政府公開統計，計算過程可重現驗證。<br>
+    這是<b>技術陣營層級的代理指標</b>，不等同於中華電信自身市占，因公開統計未提供業者別。
   </div>
 </div>
 
 <h2>四個公開目標，用公開資料一個都追不到</h2>
 <div class="grid">
   <div class="kpi warn"><div class="g">① 寬頻淨增 7 萬戶</div>
-    <div class="b">⚠ 僅陣營層級</div>
-    <div class="m">缺業者別，只能看兩陣營合計淨增</div></div>
+    <div class="b">僅陣營層級</div>
+    <div class="m">缺業者別，只能觀察兩陣營合計淨增</div></div>
   <div class="kpi warn"><div class="g">② 市占守住 51%</div>
-    <div class="b">⚠ 僅代理指標</div>
+    <div class="b">僅代理指標</div>
     <div class="m">分母有、分子沒有（無 HiNet 用戶數）</div></div>
   <div class="kpi crit"><div class="g">③ 300M 以上破 50%</div>
-    <div class="b">✕ 追不到</div>
-    <div class="m">公開統計無方案速率分佈</div></div>
+    <div class="b">追不到</div>
+    <div class="m">公開統計未提供方案速率分佈</div></div>
   <div class="kpi crit"><div class="g">④ Wi-Fi 全屋 65%</div>
-    <div class="b">✕ 追不到</div>
-    <div class="m">純內部指標，無公開來源</div></div>
+    <div class="b">追不到</div>
+    <div class="m">屬純內部指標，查無公開來源</div></div>
 </div>
-<p style="font-size:11.5px;color:{INK2};margin:9px 0 0;">
-「追不到」是本專案的內容，不是它的失敗——它同時說明三件事：知道貴公司在追什麼指標、
-知道公開資料的天花板在哪、知道需要哪些內部欄位才能補上。</p>
+<p class="after"><b>「追不到」本身即為本專案的結論。</b>此一判定同時界定了三件事：
+中華電信公開追蹤的指標為何、公開資料的覆蓋上限落在哪裡，以及補足缺口所需的內部欄位。</p>
 
 <h2>工程與方法的可驗證結果</h2>
 <div class="nums">
   <div class="num"><div class="v">16 / 16</div>
     <div class="l">資料契約檢查全過，零容差</div></div>
   <div class="num"><div class="v">60 / 60</div>
-    <div class="l">兩來源重疊 20 期比對完全相等（0.0000%）</div></div>
+    <div class="l">重疊 20 期比對完全相等（0.0000%）</div></div>
   <div class="num"><div class="v">16,604 → 409</div>
     <div class="l">查詢調校後 buffers 讀取量</div></div>
   <div class="num"><div class="v">22</div>
@@ -201,21 +259,20 @@ code{{font-size:10.5px;background:#f0f0ee;padding:0 3px;border-radius:3px;}}
 </table>
 
 <h2>我不宣稱的事</h2>
-<div class="honest"><ul>{nc}</ul></div>
+<div class="honest">{nc}</div>
 
 <div class="qrbar">
-  <img src="{qr_svg_data_uri(PAGES_URL)}" alt="QR code，開啟線上互動看板">
   <div class="qrtext">
-    <b>掃描開啟線上互動看板</b>——完整的陣營消長主圖（可縮放、可查每月數值）、
-    四張目標可追蹤性卡片、以及方法說明頁（含接合校驗與四種識別策略被否決的理由）。<br>
+    <b>掃描頁首 QR 開啟線上互動看板</b>：完整的陣營消長主圖（可縮放、可查每月數值）、
+    四張目標可追蹤性卡片，以及方法說明頁（含接合校驗與四種識別策略被否決的理由）。<br>
     <span class="u">{PAGES_URL}</span>
   </div>
 </div>
 
 <p class="foot">
-判準於看資料前寫死並存檔（<code>logs/decisions.log</code>，append-only）；
-設計推翻歷程見 <code>docs/decision-trail.md</code>。
-本專案<b>不做因果宣稱</b>——四種識別策略被具體事實否決的理由寫在看板方法說明頁。
+判準於檢視資料前固定並存檔（logs/decisions.log，append-only）；
+設計推翻歷程見 docs/decision-trail.md。<br>
+本專案不做因果宣稱，四種識別策略被具體事實否決的理由寫在看板的方法說明頁。
 </p>
 
 </div>"""

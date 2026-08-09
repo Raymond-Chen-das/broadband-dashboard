@@ -1,94 +1,136 @@
 <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>專案摘要｜中華電信固網 2026 公開目標追蹤板</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;}
-body{margin:0;background:#dce9f3;color:#0d1f2d;font-family:system-ui, -apple-system, "Segoe UI", "Microsoft JhengHei", sans-serif;line-height:1.5;
-     font-size:11.8px;}
-.page{max-width:900px;margin:0 auto;background:#f2f8fc;border:1px solid rgba(20,54,84,0.14);border-radius:16px;padding:24px 28px 20px;}
-h1{font-size:19px;font-weight:660;margin:0 0 3px;letter-spacing:-.01em;}
-.sub{font-size:11.5px;color:#6b8299;margin:0 0 16px;}
-h2{font-size:13px;font-weight:650;margin:13px 0 5px;padding-bottom:4px;
-   border-bottom:1.5px solid #0d1f2d;letter-spacing:-.005em;}
-.hero{display:flex;align-items:baseline;gap:16px;background:#e8f1f8;
-      border-left:3px solid #2a78d6;padding:14px 18px;margin-bottom:4px;
-      border-radius:0 10px 10px 0;}
-.big{font-size:31px;font-weight:680;color:#2a78d6;letter-spacing:-.02em;
-     line-height:1.1;white-space:nowrap;}
-.big em{font-style:normal;color:#eb6834;}
-.heronote{font-size:11.8px;color:#3d5568;}
-.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin:11px 0 0;}
-.kpi{border:1px solid rgba(20,54,84,0.10);border-radius:7px;padding:9px 11px;}
-.kpi .g{font-size:11.8px;font-weight:620;margin-bottom:4px;}
-.kpi .b{font-size:10.8px;font-weight:650;}
-.kpi .m{font-size:10.5px;color:#6b8299;margin-top:4px;line-height:1.5;}
-.warn .b{color:#8a5a00;} .crit .b{color:#c0392b;}
-.warn{border-top:2.5px solid #8a5a00;} .crit{border-top:2.5px solid #c0392b;}
-table{border-collapse:collapse;width:100%;font-size:11.5px;margin-top:4px;}
-th,td{border-bottom:1px solid rgba(20,54,84,0.10);padding:6px 9px 6px 0;text-align:left;
-      vertical-align:top;}
-th{color:#6b8299;font-weight:600;font-size:11px;}
-td.req{font-weight:640;width:118px;}
-td.where{color:#6b8299;font-size:10.3px;width:186px;font-family:ui-monospace,monospace;}
-ul{margin:5px 0 0;padding-left:17px;} li{margin:3px 0;}
-.honest{background:#fbf9f4;border:1px solid #e6e0cf;border-radius:7px;
-        padding:10px 14px;font-size:11.5px;}
-.honest b{color:#c0392b;}
-code{font-size:10.5px;background:#f0f0ee;padding:0 3px;border-radius:3px;}
-.nums{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-top:6px;}
-.num{border:1px solid rgba(20,54,84,0.10);border-radius:7px;padding:8px 11px;}
-.num .v{font-size:16px;font-weight:670;letter-spacing:-.01em;}
-.num .l{font-size:10.3px;color:#6b8299;margin-top:1px;line-height:1.45;}
-.foot{margin-top:16px;padding-top:9px;border-top:1px solid rgba(20,54,84,0.10);
-      font-size:10.3px;color:#6b8299;}
-.qrbar{display:flex;align-items:center;gap:14px;margin-top:14px;padding-top:11px;
-       border-top:1px solid rgba(20,54,84,0.10);}
-.qrbar img{width:74px;height:74px;flex:none;}
-.qrtext{font-size:11px;color:#3d5568;line-height:1.55;}
-.qrtext b{color:#0d1f2d;}
-.qrtext .u{font-family:ui-monospace,monospace;font-size:10px;color:#6b8299;
-           word-break:break-all;}
+body{margin:0;background:#e5e7ee;color:#131822;font-family:'IBM Plex Sans', 'Noto Sans TC', system-ui, -apple-system, 'Segoe UI', 'Microsoft JhengHei', sans-serif;line-height:1.72;
+     -webkit-font-smoothing:antialiased;padding:44px 24px 80px;}
+.page{max-width:1000px;margin:0 auto;background:#e9ecf7;
+      border:1px solid rgba(19,24,34,.09);border-radius:16px;padding:48px 52px 40px;
+      box-shadow:0 1px 2px rgba(19,24,34,.04),0 30px 70px -40px rgba(19,24,34,.45);}
+
+.head{display:flex;align-items:flex-start;justify-content:space-between;gap:40px;
+     padding-bottom:22px;border-bottom:1px solid rgba(19,24,34,.14);}
+.eyebrow{display:block;font-family:'IBM Plex Mono', 'Noto Sans TC', ui-monospace, 'Cascadia Mono', 'SF Mono', Consolas, monospace;font-size:10px;letter-spacing:.24em;
+        text-transform:uppercase;color:#4a56c9;font-weight:500;margin-bottom:10px;}
+h1{font-size:29px;font-weight:600;letter-spacing:-.03em;margin:0 0 8px;line-height:1.25;}
+.sub{font-size:12.5px;color:#8b94a3;margin:0;}
+.qr{width:78px;height:78px;flex:none;border:1px solid rgba(19,24,34,.10);
+   border-radius:8px;padding:4px;background:#fdfdff;}
+
+.hero{display:flex;align-items:center;gap:28px;background:#dfe3f2;
+     border-radius:12px;padding:24px 28px;margin-top:22px;}
+.big{font-family:'IBM Plex Mono', 'Noto Sans TC', ui-monospace, 'Cascadia Mono', 'SF Mono', Consolas, monospace;font-size:40px;font-weight:500;letter-spacing:-.045em;
+    line-height:1;white-space:nowrap;color:#4a56c9;}
+.big .arrow{color:#b9bed4;} .big em{font-style:normal;color:#131822;}
+.heronote{font-size:13.5px;color:#4c5666;border-left:1px solid rgba(19,24,34,.14);
+         padding-left:26px;}
+.heronote b{color:#131822;font-weight:500;}
+
+h2{font-size:16px;font-weight:500;letter-spacing:-.01em;margin:32px 0 14px;
+   padding-bottom:9px;border-bottom:1px solid rgba(19,24,34,.16);}
+
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
+.kpi{background:#f6f8fd;border:1px solid rgba(19,24,34,.10);border-radius:10px;
+    padding:14px 16px;transition:transform .25s ease,border-color .25s ease;}
+.kpi:hover{transform:translateY(-2px);border-color:rgba(19,24,34,.18);}
+.kpi.warn{border-top:2px solid #4a56c9;}
+.kpi.crit{border-top:2px solid #c0483c;}
+.kpi .g{font-size:13.5px;font-weight:500;margin-bottom:8px;}
+.kpi .b{font-family:'IBM Plex Mono', 'Noto Sans TC', ui-monospace, 'Cascadia Mono', 'SF Mono', Consolas, monospace;font-size:10.5px;font-weight:500;}
+.kpi.warn .b{color:#4a56c9;} .kpi.crit .b{color:#a83a2e;}
+.kpi .m{font-size:12px;color:#8b94a3;margin-top:7px;line-height:1.6;}
+.after{font-size:13px;color:#4c5666;margin:14px 0 0;}
+.after b{color:#131822;font-weight:500;}
+
+.nums{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
+.num{background:#dfe3f2;border-radius:10px;padding:14px 16px;}
+.num .v{font-family:'IBM Plex Mono', 'Noto Sans TC', ui-monospace, 'Cascadia Mono', 'SF Mono', Consolas, monospace;font-size:20px;font-weight:500;letter-spacing:-.02em;
+       font-variant-numeric:tabular-nums;}
+.num .l{font-size:11.5px;color:#7c8695;margin-top:4px;line-height:1.55;}
+
+table{border-collapse:collapse;width:100%;font-size:12.5px;}
+th{text-align:left;font-family:'IBM Plex Mono', 'Noto Sans TC', ui-monospace, 'Cascadia Mono', 'SF Mono', Consolas, monospace;font-size:10px;letter-spacing:.14em;
+   text-transform:uppercase;color:#98a0ad;font-weight:500;padding:10px 14px 8px 0;}
+td{padding:10px 14px 10px 0;border-top:1px solid rgba(19,24,34,.08);
+   vertical-align:top;color:#4c5666;}
+tbody tr:hover,tr:hover{background:rgba(19,24,34,.035);}
+td.req{font-weight:500;color:#131822;width:130px;}
+td.where{font-family:'IBM Plex Mono', 'Noto Sans TC', ui-monospace, 'Cascadia Mono', 'SF Mono', Consolas, monospace;font-size:10.5px;color:#98a0ad;width:190px;}
+th:last-child,td:last-child{padding-right:0;}
+
+.honest{background:#f6f0e8;border:1px solid rgba(160,90,24,.20);border-radius:10px;
+       padding:16px 20px;display:flex;flex-direction:column;gap:9px;}
+.nc{font-size:12.8px;color:#4c5666;}
+.nc b{color:#a05a18;font-weight:500;}
+code{font-family:'IBM Plex Mono', 'Noto Sans TC', ui-monospace, 'Cascadia Mono', 'SF Mono', Consolas, monospace;font-size:11.5px;background:rgba(19,24,34,.06);
+    padding:2px 6px;border-radius:4px;color:#4c5666;}
+
+.qrbar{margin-top:24px;padding-top:16px;border-top:1px solid rgba(19,24,34,.09);}
+.qrtext{font-size:12.5px;color:#4c5666;}
+.qrtext b{color:#131822;font-weight:500;}
+.qrtext .u{font-family:'IBM Plex Mono', 'Noto Sans TC', ui-monospace, 'Cascadia Mono', 'SF Mono', Consolas, monospace;font-size:10.5px;color:#8b94a3;word-break:break-all;}
+
+.foot{margin:22px 0 0;padding-top:14px;border-top:1px solid rgba(19,24,34,.09);
+     font-family:'IBM Plex Mono', 'Noto Sans TC', ui-monospace, 'Cascadia Mono', 'SF Mono', Consolas, monospace;font-size:10.5px;line-height:1.9;color:#98a0ad;}
+a{color:#4a56c9;text-decoration:none;border-bottom:1px solid rgba(74,86,201,.28);}
+a:hover{color:#333db3;border-bottom-color:#333db3;}
+@media (max-width:900px){
+  .page{padding:32px 24px;}
+  .grid,.nums{grid-template-columns:1fr 1fr;}
+  .hero{flex-direction:column;align-items:flex-start;gap:14px;}
+  .heronote{border-left:0;padding-left:0;}
+}
 </style>
 <div class="page">
 
-<h1>中華電信固網 2026 公開目標追蹤板</h1>
-<p class="sub">外部求職者以公開資料製作　·　資料來源：NCC／data.gov.tw
-（2007-01 ~ 2026-05，月頻率）　·
-非中華電信內部文件，不代表該公司立場</p>
+<div class="head">
+  <div>
+    <span class="eyebrow">專案摘要 / 01　·　陳嘉翔</span>
+    <h1>中華電信固網 2026 公開目標追蹤板</h1>
+    <p class="sub">外部求職者以公開資料製作　·　NCC／data.gov.tw
+    （2007-01 到 2026-05，月頻率）　·　非中華電信內部文件</p>
+  </div>
+  <img class="qr" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzNyIgaGVpZ2h0PSIzNyIgY2xhc3M9InNlZ25vIj48cGF0aCBmaWxsPSIjZmZmIiBkPSJNMCAwaDM3djM3aC0zN3oiLz48cGF0aCBjbGFzcz0icXJsaW5lIiBzdHJva2U9IiMxMzE4MjIiIGQ9Ik0yIDIuNWg3bTEgMGgybTMgMGgybTEgMGgxbTEgMGgzbTIgMGgxbTIgMGg3bS0zMyAxaDFtNSAwaDFtMSAwaDFtMyAwaDJtOCAwaDNtMSAwaDFtNSAwaDFtLTMzIDFoMW0xIDBoM20xIDBoMW0yIDBoMm01IDBoMW0yIDBoMm0yIDBoMm0xIDBoMW0xIDBoM20xIDBoMW0tMzMgMWgxbTEgMGgzbTEgMGgxbTEgMGgzbTEgMGgxbTEgMGgxbTEgMGgybTEgMGgybTEgMGgzbTEgMGgxbTEgMGgzbTEgMGgxbS0zMyAxaDFtMSAwaDNtMSAwaDFtMyAwaDFtMSAwaDFtMSAwaDFtMiAwaDFtMSAwaDFtMSAwaDFtNCAwaDFtMSAwaDNtMSAwaDFtLTMzIDFoMW01IDBoMW0yIDBoMW0xIDBoMW0xIDBoMm0zIDBoNG00IDBoMW01IDBoMW0tMzMgMWg3bTEgMGgxbTEgMGgxbTEgMGgxbTEgMGgxbTEgMGgxbTEgMGgxbTEgMGgxbTEgMGgxbTEgMGgxbTEgMGg3bS0yNSAxaDNtNiAwaDFtMiAwaDFtMiAwaDJtLTI1IDFoMW0xIDBoMm0xIDBoM20xIDBoMm0xIDBoMW0xIDBoMW0xIDBoNG0xIDBoMW00IDBoMW0yIDBoMW0xIDBoMm0tMzMgMWgxbTIgMGgxbTYgMGgzbTMgMGgxbTEgMGgybTEgMGgxbTEgMGgxbTIgMGgybTEgMGgybTEgMGgxbS0yOSAxaDFtMSAwaDFtMyAwaDFtMSAwaDFtMSAwaDFtMiAwaDJtMSAwaDFtMSAwaDNtMSAwaDRtMSAwaDJtLTMxIDFoMm0xIDBoMW0zIDBoMW0yIDBoM201IDBoMW0xIDBoMW0xIDBoMW0yIDBoMW0xIDBoMW0tMzAgMWgxbTUgMGgybTMgMGgybTIgMGgxbTEgMGgzbTIgMGg0bTEgMGgzbTIgMGgxbS0zMyAxaDFtMiAwaDFtNCAwaDJtMyAwaDFtMiAwaDJtMSAwaDFtNCAwaDFtMiAwaDFtMiAwaDJtLTMyIDFoMW0xIDBoMW0xIDBoNW0yIDBoM20xIDBoMm0yIDBoMm01IDBoMm0xIDBoMm0tMzEgMWgxbTEgMGgxbTQgMGgybTEgMGgxbTEgMGgxbTMgMGgxbTIgMGgzbTEgMGgxbTEgMGgybTEgMGgxbTEgMGgxbS0zMSAxaDFtMiAwaDFtMSAwaDNtMSAwaDJtMSAwaDVtMSAwaDRtMyAwaDJtMSAwaDNtLTMwIDFoMm0yIDBoMW0yIDBoMm0yIDBoNG0xIDBoMm0xIDBoMW0xIDBoM20xIDBoMW0xIDBoMm0xIDBoMm0tMzMgMWg3bTIgMGgybTMgMGg0bTIgMGgybTMgMGgxbTEgMGgybTEgMGgybS0zMiAxaDJtMSAwaDFtMyAwaDJtMyAwaDFtNCAwaDJtMyAwaDJtMiAwaDFtMSAwaDFtLTI3IDFoMm0yIDBoM20xIDBoM20xIDBoMm0zIDBoMW0xIDBoMW0xIDBoMW01IDBoMm0xIDBoMW0tMzMgMWgxbTIgMGgzbTEgMGg0bTIgMGgxbTEgMGgxbTIgMGgzbTEgMGgybTIgMGgxbTIgMGgxbTIgMGgxbS0yOSAxaDRtMiAwaDFtMSAwaDNtMSAwaDFtMyAwaDFtMSAwaDNtMSAwaDFtMSAwaDFtMSAwaDNtLTMyIDFoMW0zIDBoMW0xIDBoMW0xIDBoM20xIDBoMW0yIDBoMW0xIDBoMW02IDBoMm0xIDBoMm0yIDBoMW0tMzMgMWgxbTEgMGgzbTEgMGgybTEgMGg3bTEgMGgybTMgMGgxbTEgMGg1bTIgMGgxbS0yNCAxaDNtMSAwaDFtMSAwaDRtMSAwaDFtNCAwaDFtMyAwaDJtLTMwIDFoN20xIDBoMm0xIDBoMW0yIDBoMW00IDBoMW0xIDBoNG0xIDBoMW0xIDBoMW0yIDBoMW0tMzIgMWgxbTUgMGgxbTEgMGgxbTEgMGgxbTIgMGgxbTIgMGgxbTEgMGgxbTIgMGg0bTMgMGgzbTEgMGgxbS0zMyAxaDFtMSAwaDNtMSAwaDFtMiAwaDJtMSAwaDFtMSAwaDFtMiAwaDFtMSAwaDEwbTEgMGgxbTEgMGgxbS0zMyAxaDFtMSAwaDNtMSAwaDFtMSAwaDFtMSAwaDFtMSAwaDFtMSAwaDFtMiAwaDFtMiAwaDFtMSAwaDJtMyAwaDFtNCAwaDFtLTMzIDFoMW0xIDBoM20xIDBoMW0xIDBoMW0yIDBoNG0yIDBoMW02IDBoMW0xIDBoMm0tMjggMWgxbTUgMGgxbTIgMGgxbTIgMGgxbTEgMGg0bTIgMGgxbTEgMGgzbTEgMGgzbTMgMGgxbS0zMyAxaDdtMSAwaDJtMSAwaDFtMiAwaDVtMiAwaDFtMSAwaDFtMSAwaDJtMSAwaDMiLz48L3N2Zz4K" alt="QR code，開啟線上互動看板">
+</div>
 
 <div class="hero">
-  <div class="big">75.4% → <em>66.4%</em></div>
+  <div class="big">75.4% <span class="arrow">→</span>
+    <em>66.4%</em></div>
   <div class="heronote">
     台灣固網寬頻，<b>電信陣營占比 7 年下降 8.97 個百分點</b>。
-    政府公開統計、可驗證。<br>
-    這是<b>技術陣營層級的代理指標</b>，不是中華電信自身市占——公開統計無業者別。
+    資料取自政府公開統計，計算過程可重現驗證。<br>
+    這是<b>技術陣營層級的代理指標</b>，不等同於中華電信自身市占，因公開統計未提供業者別。
   </div>
 </div>
 
 <h2>四個公開目標，用公開資料一個都追不到</h2>
 <div class="grid">
   <div class="kpi warn"><div class="g">① 寬頻淨增 7 萬戶</div>
-    <div class="b">⚠ 僅陣營層級</div>
-    <div class="m">缺業者別，只能看兩陣營合計淨增</div></div>
+    <div class="b">僅陣營層級</div>
+    <div class="m">缺業者別，只能觀察兩陣營合計淨增</div></div>
   <div class="kpi warn"><div class="g">② 市占守住 51%</div>
-    <div class="b">⚠ 僅代理指標</div>
+    <div class="b">僅代理指標</div>
     <div class="m">分母有、分子沒有（無 HiNet 用戶數）</div></div>
   <div class="kpi crit"><div class="g">③ 300M 以上破 50%</div>
-    <div class="b">✕ 追不到</div>
-    <div class="m">公開統計無方案速率分佈</div></div>
+    <div class="b">追不到</div>
+    <div class="m">公開統計未提供方案速率分佈</div></div>
   <div class="kpi crit"><div class="g">④ Wi-Fi 全屋 65%</div>
-    <div class="b">✕ 追不到</div>
-    <div class="m">純內部指標，無公開來源</div></div>
+    <div class="b">追不到</div>
+    <div class="m">屬純內部指標，查無公開來源</div></div>
 </div>
-<p style="font-size:11.5px;color:#3d5568;margin:9px 0 0;">
-「追不到」是本專案的內容，不是它的失敗——它同時說明三件事：知道貴公司在追什麼指標、
-知道公開資料的天花板在哪、知道需要哪些內部欄位才能補上。</p>
+<p class="after"><b>「追不到」本身即為本專案的結論。</b>此一判定同時界定了三件事：
+中華電信公開追蹤的指標為何、公開資料的覆蓋上限落在哪裡，以及補足缺口所需的內部欄位。</p>
 
 <h2>工程與方法的可驗證結果</h2>
 <div class="nums">
   <div class="num"><div class="v">16 / 16</div>
     <div class="l">資料契約檢查全過，零容差</div></div>
   <div class="num"><div class="v">60 / 60</div>
-    <div class="l">兩來源重疊 20 期比對完全相等（0.0000%）</div></div>
+    <div class="l">重疊 20 期比對完全相等（0.0000%）</div></div>
   <div class="num"><div class="v">16,604 → 409</div>
     <div class="l">查詢調校後 buffers 讀取量</div></div>
   <div class="num"><div class="v">22</div>
@@ -98,25 +140,24 @@ code{font-size:10.5px;background:#f0f0ee;padding:0 3px;border-radius:3px;}
 <h2>條件對照</h2>
 <table>
   <tr><th>能力項目</th><th>本專案的對應證據</th><th>位置</th></tr>
-  <tr><td class='req'>熟悉資料庫操作</td><td>PostgreSQL 17 星型 schema、冪等 upsert（逐列 md5 驗證）、SQL 視窗函數計算全部指標、查詢調校（Seq Scan → Index Only Scan，buffers 16,604 → 409）、索引寫入代價實測</td><td class='where'>src/load_postgres.py｜src/compute_metrics.py｜docs/20-db-experiments.md</td></tr><tr><td class='req'>資料分析與統計方法</td><td>判準看資料前寫死並存檔（append-only）、兩來源接合校驗（60 筆零差異）、四種因果識別策略逐一否決並寫明理由、限制章節六條</td><td class='where'>logs/decisions.log｜docs/30-splice-validation-report.md</td></tr><tr><td class='req'>資料處理與品質控管</td><td>16 項資料契約驗證（欄位、型別、算術、連續性、期間），契約不過即擋、不得先跑跑看；22 項自動化測試把 Ground Truth 編碼為回歸測試</td><td class='where'>src/validate_contracts.py｜tests/test_pipeline.py</td></tr><tr><td class='req'>視覺化與溝通</td><td>單頁離線 HTML 看板；調色盤經色覺驗證器檢查（明暗兩模式全通過）；限制寫在圖旁而非附錄；未達成的指標明確標示為「追不到」而非省略</td><td class='where'>dashboard/index.html｜src/build_dashboard.py</td></tr><tr><td class='req'>專案成效追蹤（可持續運行）</td><td>月更新管線：data.gov.tw 兩段式取用 → 契約驗證 → 缺月偵測 → 冪等 upsert → 重生看板；已對真實新月份端到端實跑成功</td><td class='where'>src/update_monthly.py｜logs/update-runs.log</td></tr>
+  <tr><td class='req'>熟悉資料庫操作</td><td>PostgreSQL 17 星型 schema、冪等 upsert（逐列 md5 驗證）、以 SQL 視窗函數計算全部指標、查詢調校（Seq Scan 改為 Index Only Scan，buffers 16,604 降到 409）、索引寫入代價實測</td><td class='where'>src/load_postgres.py<br>src/compute_metrics.py<br>docs/20-db-experiments.md</td></tr><tr><td class='req'>資料分析與統計方法</td><td>判準於檢視資料前固定並存檔（append-only）、兩來源接合校驗 60 筆零差異、四種因果識別策略逐一否決並寫明理由、限制章節六條</td><td class='where'>logs/decisions.log<br>docs/30-splice-validation-report.md</td></tr><tr><td class='req'>資料處理與品質控管</td><td>16 項資料契約驗證（欄位、型別、算術、連續性、期間），任一項未通過即中止後續所有階段；22 項自動化測試將 Ground Truth 編碼為回歸測試</td><td class='where'>src/validate_contracts.py<br>tests/test_pipeline.py</td></tr><tr><td class='req'>視覺化與溝通</td><td>單頁離線 HTML 看板；調色盤經色覺驗證器檢查；限制敘述置於圖側而非附錄；不可追蹤的指標明確標示，不予省略</td><td class='where'>dashboard/index.html<br>src/build_dashboard.py</td></tr><tr><td class='req'>專案成效追蹤（可持續運行）</td><td>月更新管線：data.gov.tw 兩段式取用、契約驗證、缺月偵測、冪等 upsert、重生看板。已針對真實的新月份完成端到端實跑</td><td class='where'>src/update_monthly.py<br>logs/update-runs.log</td></tr>
 </table>
 
 <h2>我不宣稱的事</h2>
-<div class="honest"><ul><li><b>無 Teradata 實機經驗</b>——刻意未做 PI／skew 實驗。理由：被追問三層答不出來的展示，不放進交付物（<code>docs/20-db-experiments.md</code> 有完整說明）。</li><li><b>無生產環境 MLOps 經驗</b>——本專案的月更新管線是 DataOps，不是 MLOps，不作此宣稱。</li><li><b>本作品集刻意不含公文格式文件</b>——沒有人會把自己的數據作品集做成公文。為了命中 單一條款而扭曲作品形態，本身就是負面訊號。</li><li><b>本專案不含任何模型</b>——價值在約束與工程，不在演算法。</li></ul></div>
+<div class="honest"><div class='nc'><b>沒有 Teradata 實機經驗。</b>刻意未進行 PI 與 skew 實驗；無法承受三層追問的展示不納入交付物（<code>docs/20-db-experiments.md</code> 有完整說明）。</div><div class='nc'><b>沒有生產環境的 MLOps 經驗。</b>本專案的月更新管線屬 DataOps 而非 MLOps，故不作此宣稱。</div><div class='nc'><b>刻意不含公文格式文件。</b>為迎合 單一條款而扭曲作品形態，本身即為負面訊號。</div><div class='nc'><b>不含任何模型。</b>價值在約束與工程，不在演算法。</div></div>
 
 <div class="qrbar">
-  <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzNyIgaGVpZ2h0PSIzNyIgY2xhc3M9InNlZ25vIj48cGF0aCBmaWxsPSIjZmZmIiBkPSJNMCAwaDM3djM3aC0zN3oiLz48cGF0aCBjbGFzcz0icXJsaW5lIiBzdHJva2U9IiMwYjBiMGIiIGQ9Ik0yIDIuNWg3bTEgMGgybTMgMGgybTEgMGgxbTEgMGgzbTIgMGgxbTIgMGg3bS0zMyAxaDFtNSAwaDFtMSAwaDFtMyAwaDJtOCAwaDNtMSAwaDFtNSAwaDFtLTMzIDFoMW0xIDBoM20xIDBoMW0yIDBoMm01IDBoMW0yIDBoMm0yIDBoMm0xIDBoMW0xIDBoM20xIDBoMW0tMzMgMWgxbTEgMGgzbTEgMGgxbTEgMGgzbTEgMGgxbTEgMGgxbTEgMGgybTEgMGgybTEgMGgzbTEgMGgxbTEgMGgzbTEgMGgxbS0zMyAxaDFtMSAwaDNtMSAwaDFtMyAwaDFtMSAwaDFtMSAwaDFtMiAwaDFtMSAwaDFtMSAwaDFtNCAwaDFtMSAwaDNtMSAwaDFtLTMzIDFoMW01IDBoMW0yIDBoMW0xIDBoMW0xIDBoMm0zIDBoNG00IDBoMW01IDBoMW0tMzMgMWg3bTEgMGgxbTEgMGgxbTEgMGgxbTEgMGgxbTEgMGgxbTEgMGgxbTEgMGgxbTEgMGgxbTEgMGgxbTEgMGg3bS0yNSAxaDNtNiAwaDFtMiAwaDFtMiAwaDJtLTI1IDFoMW0xIDBoMm0xIDBoM20xIDBoMm0xIDBoMW0xIDBoMW0xIDBoNG0xIDBoMW00IDBoMW0yIDBoMW0xIDBoMm0tMzMgMWgxbTIgMGgxbTYgMGgzbTMgMGgxbTEgMGgybTEgMGgxbTEgMGgxbTIgMGgybTEgMGgybTEgMGgxbS0yOSAxaDFtMSAwaDFtMyAwaDFtMSAwaDFtMSAwaDFtMiAwaDJtMSAwaDFtMSAwaDNtMSAwaDRtMSAwaDJtLTMxIDFoMm0xIDBoMW0zIDBoMW0yIDBoM201IDBoMW0xIDBoMW0xIDBoMW0yIDBoMW0xIDBoMW0tMzAgMWgxbTUgMGgybTMgMGgybTIgMGgxbTEgMGgzbTIgMGg0bTEgMGgzbTIgMGgxbS0zMyAxaDFtMiAwaDFtNCAwaDJtMyAwaDFtMiAwaDJtMSAwaDFtNCAwaDFtMiAwaDFtMiAwaDJtLTMyIDFoMW0xIDBoMW0xIDBoNW0yIDBoM20xIDBoMm0yIDBoMm01IDBoMm0xIDBoMm0tMzEgMWgxbTEgMGgxbTQgMGgybTEgMGgxbTEgMGgxbTMgMGgxbTIgMGgzbTEgMGgxbTEgMGgybTEgMGgxbTEgMGgxbS0zMSAxaDFtMiAwaDFtMSAwaDNtMSAwaDJtMSAwaDVtMSAwaDRtMyAwaDJtMSAwaDNtLTMwIDFoMm0yIDBoMW0yIDBoMm0yIDBoNG0xIDBoMm0xIDBoMW0xIDBoM20xIDBoMW0xIDBoMm0xIDBoMm0tMzMgMWg3bTIgMGgybTMgMGg0bTIgMGgybTMgMGgxbTEgMGgybTEgMGgybS0zMiAxaDJtMSAwaDFtMyAwaDJtMyAwaDFtNCAwaDJtMyAwaDJtMiAwaDFtMSAwaDFtLTI3IDFoMm0yIDBoM20xIDBoM20xIDBoMm0zIDBoMW0xIDBoMW0xIDBoMW01IDBoMm0xIDBoMW0tMzMgMWgxbTIgMGgzbTEgMGg0bTIgMGgxbTEgMGgxbTIgMGgzbTEgMGgybTIgMGgxbTIgMGgxbTIgMGgxbS0yOSAxaDRtMiAwaDFtMSAwaDNtMSAwaDFtMyAwaDFtMSAwaDNtMSAwaDFtMSAwaDFtMSAwaDNtLTMyIDFoMW0zIDBoMW0xIDBoMW0xIDBoM20xIDBoMW0yIDBoMW0xIDBoMW02IDBoMm0xIDBoMm0yIDBoMW0tMzMgMWgxbTEgMGgzbTEgMGgybTEgMGg3bTEgMGgybTMgMGgxbTEgMGg1bTIgMGgxbS0yNCAxaDNtMSAwaDFtMSAwaDRtMSAwaDFtNCAwaDFtMyAwaDJtLTMwIDFoN20xIDBoMm0xIDBoMW0yIDBoMW00IDBoMW0xIDBoNG0xIDBoMW0xIDBoMW0yIDBoMW0tMzIgMWgxbTUgMGgxbTEgMGgxbTEgMGgxbTIgMGgxbTIgMGgxbTEgMGgxbTIgMGg0bTMgMGgzbTEgMGgxbS0zMyAxaDFtMSAwaDNtMSAwaDFtMiAwaDJtMSAwaDFtMSAwaDFtMiAwaDFtMSAwaDEwbTEgMGgxbTEgMGgxbS0zMyAxaDFtMSAwaDNtMSAwaDFtMSAwaDFtMSAwaDFtMSAwaDFtMSAwaDFtMiAwaDFtMiAwaDFtMSAwaDJtMyAwaDFtNCAwaDFtLTMzIDFoMW0xIDBoM20xIDBoMW0xIDBoMW0yIDBoNG0yIDBoMW02IDBoMW0xIDBoMm0tMjggMWgxbTUgMGgxbTIgMGgxbTIgMGgxbTEgMGg0bTIgMGgxbTEgMGgzbTEgMGgzbTMgMGgxbS0zMyAxaDdtMSAwaDJtMSAwaDFtMiAwaDVtMiAwaDFtMSAwaDFtMSAwaDJtMSAwaDMiLz48L3N2Zz4K" alt="QR code，開啟線上互動看板">
   <div class="qrtext">
-    <b>掃描開啟線上互動看板</b>——完整的陣營消長主圖（可縮放、可查每月數值）、
-    四張目標可追蹤性卡片、以及方法說明頁（含接合校驗與四種識別策略被否決的理由）。<br>
+    <b>掃描頁首 QR 開啟線上互動看板</b>：完整的陣營消長主圖（可縮放、可查每月數值）、
+    四張目標可追蹤性卡片，以及方法說明頁（含接合校驗與四種識別策略被否決的理由）。<br>
     <span class="u">https://raymond-chen-das.github.io/broadband-dashboard/</span>
   </div>
 </div>
 
 <p class="foot">
-判準於看資料前寫死並存檔（<code>logs/decisions.log</code>，append-only）；
-設計推翻歷程見 <code>docs/decision-trail.md</code>。
-本專案<b>不做因果宣稱</b>——四種識別策略被具體事實否決的理由寫在看板方法說明頁。
+判準於檢視資料前固定並存檔（logs/decisions.log，append-only）；
+設計推翻歷程見 docs/decision-trail.md。<br>
+本專案不做因果宣稱，四種識別策略被具體事實否決的理由寫在看板的方法說明頁。
 </p>
 
 </div>

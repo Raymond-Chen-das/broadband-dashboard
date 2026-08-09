@@ -58,14 +58,29 @@ TELCO_C, CABLE_C = "#2a78d6", "#eb6834"
 CABLE_D = "#a8420c"                       # 橘的深階，供文字用（白底對比足夠）
 ACCENT, ACCENT_D = "#2a78d6", "#1b5590"
 
-PAPER = "#eef2f6"        # 紙：冷調，上面鋪細方格
-PAPER2 = "#e3eaf1"       # 次階紙：引用區、表格 hover
+# 版面的明暗節奏。前四版都做成「整頁同一片淺色」，結果不管字級怎麼調都是平的
+# ——問題不在字級，在於整頁沒有任何明暗對比。改成**深色帶包夾淺色內文**：
+# 深色 hero 起、深色頁尾收，中間留給中文閱讀。整頁全深會讓中文筆畫糊掉，
+# 這裡只讓深色承擔標題與收尾，內文照樣白底黑字。
+VOID = "#071720"         # 深場：近黑的墨藍綠，hero 與頁尾的地
+VOID2 = "#0d3040"        # 深場的漸層對位，偏青
+ONVOID = "#dceaf2"       # 深場上的文字
+ONVOID2 = "#8fb0c2"      # 深場上的次級文字
+
+# 紙不能跟白卡同色。前一版 PAPER=#f5f7f9、CARD=#ffffff，兩者差不到一階，
+# 結果 600px 高的白色圖表卡像懸在半空，看不出是一張卡。
+PAPER = "#e9eef3"        # 紙：明顯低於白卡一階，不鋪紋理
+PAPER2 = "#dde5ec"       # 次階紙：引用區、表格 hover
 CARD = "#ffffff"         # 圖表卡
-RULE = "rgba(15,35,51,0.16)"
+RULE = "rgba(15,35,51,0.14)"
 
 INK = "#0f2333"          # 主墨：深海軍藍，不用純黑
 INK2 = "#43596d"
 MUTED = "#7b8fa3"
+
+# 深場上的陣營色。淺底那組直接搬過去會太暗，各自提亮一階；
+# 線寬 2.4px 以上，對 #071720 的對比足夠。
+TELCO_L, CABLE_L = "#63acf7", "#ff9560"
 
 # Plotly 圖畫在白卡上
 SURFACE = CARD
@@ -262,46 +277,84 @@ CSS = f"""
 html{{-webkit-text-size-adjust:100%;scroll-behavior:smooth;}}
 body{{margin:0;background:{PAPER};color:{INK};font-family:{SANS};
      line-height:1.72;letter-spacing:.005em;}}
-/* 細方格紋理：訊號圖紙的暗示，不是裝飾用的雜訊 */
-body::before{{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
-  background-image:linear-gradient(rgba(15,35,51,.045) 1px,transparent 1px),
-                   linear-gradient(90deg,rgba(15,35,51,.045) 1px,transparent 1px);
-  background-size:34px 34px;}}
 .wrap{{max-width:1120px;margin:0 auto;padding:0 26px;}}
 
 /* ══ 眉標：標的是「這一段回答哪個問題」 ═══════════════════════════ */
 .eyebrow{{font-family:{MONO};font-size:11px;letter-spacing:.28em;text-transform:uppercase;
         color:{ACCENT_D};display:block;margin-bottom:16px;font-weight:600;}}
 
-/* ══ HERO：發現本身就是 hero ════════════════════════════════════
-   不是「大數字＋標籤＋漸層」那種模板解。兩條陣營軌跡橫貫整個 hero，
-   中間逐年收窄的缺口就是標題講的那 9 個百分點。資料與主圖同源。 */
-.masthead{{position:relative;padding:76px 0 0;border-bottom:1.5px solid {INK};
-         overflow:hidden;}}
-.herofig{{position:absolute;left:0;right:0;bottom:0;width:100%;height:250px;
-        opacity:.55;}}
+/* ══ HERO：深場 ═══════════════════════════════════════════════
+   前一版把軌跡圖用 position:absolute 壓在文字底下，靠 .meta 的固定
+   padding-bottom 幫它讓位——文字一換行，兩條線就爬到標題上。
+   這裡改成**兩個真實的版面帶**：上帶放字，下帶放圖，各自佔位，
+   不會互相穿透。深色地讓兩條線發亮，也是整頁唯一的重色。 */
+.masthead{{background:
+  radial-gradient(1200px 520px at 78% -22%, rgba(42,120,214,.30), transparent 62%),
+  radial-gradient(760px 420px at 6% 118%, rgba(235,104,52,.16), transparent 66%),
+  linear-gradient(158deg, {VOID} 0%, {VOID2} 100%);
+  color:{ONVOID};position:relative;overflow:hidden;}}
+/* 細方格只留在深場上：儀器螢幕的暗示，不是滿版雜訊 */
+.masthead::before{{content:"";position:absolute;inset:0;pointer-events:none;
+  background-image:linear-gradient(rgba(255,255,255,.05) 1px,transparent 1px),
+                   linear-gradient(90deg,rgba(255,255,255,.05) 1px,transparent 1px);
+  background-size:46px 46px;
+  mask-image:linear-gradient(#000 46%, transparent 92%);
+  -webkit-mask-image:linear-gradient(#000 46%, transparent 92%);}}
 .masthead .wrap{{position:relative;z-index:1;}}
-h1{{font-family:{SERIF};font-size:clamp(2.6rem,6.6vw,5.2rem);font-weight:900;
-   line-height:.97;letter-spacing:-.022em;margin:0 0 22px;max-width:19ch;}}
-h1 em{{font-style:normal;color:{ACCENT_D};}}
-.standfirst{{font-size:16px;color:{INK2};max-width:60ch;margin:0 0 30px;}}
-.standfirst b{{color:{INK};font-weight:650;}}
+/* 上帶分兩欄：左邊說話，右邊是讀數。第一版全部靠左，右半頁整片空白，
+   那正是「樸素」的來源——不是字不夠大，是版面只用了一半寬度。 */
+.mast-type{{padding:74px 0 44px;display:grid;grid-template-columns:1fr 260px;
+          gap:0 56px;align-items:start;}}
+.masthead .eyebrow{{color:rgba(220,234,242,.62);}}
+h1{{font-family:{SERIF};font-size:clamp(2.6rem,5.6vw,4.5rem);font-weight:900;
+   line-height:1.0;letter-spacing:-.022em;margin:0 0 26px;max-width:16ch;
+   color:#fff;text-wrap:balance;}}
+h1 em{{font-style:normal;color:{TELCO_L};}}
+.standfirst{{font-size:15.5px;color:{ONVOID2};max-width:52ch;margin:0;}}
+.standfirst b{{color:{ONVOID};font-weight:650;}}
 
-.readout{{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;
-        font-family:{MONO};font-variant-numeric:tabular-nums;margin:0 0 14px;}}
-.readout .from{{font-size:clamp(1.6rem,3.4vw,2.6rem);font-weight:600;color:{MUTED};
-              letter-spacing:-.03em;line-height:1;}}
-.readout .arrow{{font-size:1.3rem;color:{MUTED};line-height:1;}}
-.readout .to{{font-size:clamp(2.6rem,6vw,4.4rem);font-weight:800;color:{INK};
-            letter-spacing:-.04em;line-height:1;}}
-.delta{{font-family:{MONO};font-size:14px;font-weight:650;color:{CABLE_D};
-      border-bottom:2px solid {CABLE_C};padding-bottom:2px;}}
-.masthead .meta{{font-family:{MONO};font-size:12px;color:{MUTED};letter-spacing:.02em;
-               padding:0 0 150px;}}
+/* 讀數欄：直排，像儀表側邊的數值窗，靠一條左界線與左欄分開 */
+.readout{{font-family:{MONO};font-variant-numeric:tabular-nums;
+        border-left:1px solid rgba(220,234,242,.20);padding-left:26px;
+        display:flex;flex-direction:column;align-items:flex-start;}}
+.readout .rlab{{font-size:10.5px;letter-spacing:.2em;
+              color:rgba(220,234,242,.42);margin-bottom:6px;}}
+.readout .from{{font-size:2rem;font-weight:600;color:rgba(220,234,242,.55);
+              letter-spacing:-.03em;line-height:1;margin-bottom:22px;}}
+.readout .to{{font-size:3.3rem;font-weight:800;color:#fff;
+            letter-spacing:-.04em;line-height:1;margin-bottom:16px;}}
+.delta{{font-size:14px;font-weight:650;color:{CABLE_L};
+      border-bottom:2px solid {CABLE_L};padding-bottom:3px;}}
+.readout .rsrc{{font-size:10.5px;line-height:1.9;color:rgba(220,234,242,.42);
+              margin-top:26px;padding-top:16px;
+              border-top:1px solid rgba(220,234,242,.14);}}
+
+/* ── hero 下帶：軌跡圖自己的版面列，附兩端年份 ── */
+.mast-fig{{position:relative;padding-bottom:14px;}}
+.herofig{{display:block;width:100%;height:210px;}}
+.figscale{{display:flex;justify-content:space-between;font-family:{MONO};
+         font-size:11px;letter-spacing:.14em;color:rgba(220,234,242,.42);
+         padding:8px 0 0;border-top:1px solid rgba(220,234,242,.16);}}
+.figkey{{display:flex;gap:20px;}}
+.figkey i{{font-style:normal;display:inline-flex;align-items:center;gap:7px;}}
+.figkey i::before{{content:"";width:16px;height:2.5px;background:currentColor;}}
+.figkey em{{font-style:normal;color:rgba(220,234,242,.34);}}
 
 /* ══ 區塊：用線分隔，不是到處堆盒子 ═══════════════════════════════ */
-.blk{{padding:66px 0;border-bottom:1px solid {RULE};}}
-.blk:last-of-type{{border-bottom:0;}}
+.sec{{padding:72px 0;border-bottom:1px solid {RULE};}}
+.sec:last-of-type{{border-bottom:0;}}
+
+/* 深色帶。整頁若從頭到尾同一片淺色，不管字級怎麼調都是平的。
+   這一帶留給「四個目標一個都追不到」——那是本作品的核心內容，
+   讓版面的第二個重音正好落在它上面，而不是落在裝飾上。 */
+.sec.dark{{background:
+  radial-gradient(900px 480px at 88% 0%, rgba(42,120,214,.22), transparent 64%),
+  linear-gradient(200deg, {VOID2} 0%, {VOID} 100%);
+  color:{ONVOID};border-bottom:0;padding:76px 0 84px;}}
+.sec.dark h2{{color:#fff;}}
+.sec.dark .eyebrow{{color:rgba(220,234,242,.62);}}
+.sec.dark .sectionnote{{color:{ONVOID2};}}
+.sec.dark .sectionnote b{{color:#fff;}}
 h2{{font-family:{SERIF};font-size:clamp(1.55rem,3vw,2.3rem);font-weight:800;
    margin:0 0 10px;letter-spacing:-.018em;line-height:1.2;}}
 h3{{font-family:{SERIF};font-size:1.15rem;font-weight:700;margin:34px 0 8px;}}
@@ -318,8 +371,9 @@ h3{{font-family:{SERIF};font-size:1.15rem;font-weight:700;margin:34px 0 8px;}}
 .stat .lab{{font-size:12.5px;color:{MUTED};margin-top:8px;line-height:1.55;}}
 
 /* ══ 圖表 ═════════════════════════════════════════════════════ */
-.card{{background:{CARD};border:1px solid {RULE};border-radius:2px;
-     padding:16px 14px 10px;margin-top:30px;overflow-x:auto;}}
+.card{{background:{CARD};border:1px solid rgba(15,35,51,.10);border-radius:3px;
+     padding:18px 16px 12px;margin-top:0;overflow-x:auto;
+     box-shadow:0 1px 2px rgba(15,35,51,.05), 0 12px 34px -12px rgba(15,35,51,.22);}}
 .card > div{{min-width:860px;}}
 
 .limits{{border-left:3px solid {ACCENT};background:{PAPER2};
@@ -332,25 +386,27 @@ h3{{font-family:{SERIF};font-size:1.15rem;font-weight:700;margin:34px 0 8px;}}
 
 /* ══ KPI：訊號格把「可追蹤性」畫出來 ═════════════════════════════
    亮幾格＝這個目標追得到多少。顏色、格數、圖示、文字四重編碼。 */
-.kpis{{display:grid;grid-template-columns:repeat(4,1fr);margin-top:34px;
-     border-top:2px solid {INK};}}
-.kpi{{padding:26px 22px 24px 0;border-right:1px solid {RULE};
+.kpis{{display:grid;grid-template-columns:repeat(4,1fr);margin-top:38px;
+     border-top:1px solid rgba(220,234,242,.30);}}
+.kpi{{padding:28px 24px 26px 0;border-right:1px solid rgba(220,234,242,.14);
     display:flex;flex-direction:column;}}
 .kpi:last-child{{border-right:0;}}
-.kpi .idx{{font-family:{MONO};font-size:10.5px;letter-spacing:.24em;color:{MUTED};}}
+.kpi .idx{{font-family:{MONO};font-size:10.5px;letter-spacing:.24em;
+         color:rgba(220,234,242,.42);}}
 .signal{{display:flex;gap:3px;margin:14px 0 16px;max-width:120px;}}
-.seg{{height:7px;flex:1;background:rgba(15,35,51,.11);}}
-.kpi.partial .seg.on{{background:{ACCENT};}}
+.seg{{height:7px;flex:1;background:rgba(220,234,242,.13);}}
+.kpi.partial .seg.on{{background:{TELCO_L};box-shadow:0 0 10px rgba(99,172,247,.55);}}
 .kpi .goal{{font-family:{SERIF};font-size:1.2rem;font-weight:700;margin:0 0 12px;
-          line-height:1.42;}}
-.kpi .goal .sub{{display:block;font-family:{MONO};font-size:11.5px;color:{MUTED};
+          line-height:1.42;color:#fff;}}
+.kpi .goal .sub{{display:block;font-family:{MONO};font-size:11.5px;
+               color:rgba(220,234,242,.45);
                font-weight:400;margin-top:8px;letter-spacing:.02em;}}
 .badge{{font-family:{MONO};font-size:11px;font-weight:650;letter-spacing:.06em;
       margin-bottom:14px;align-self:flex-start;}}
-.badge.partial{{color:{ACCENT_D};}} .badge.none{{color:{BREAK_C};}}
-.kpi .miss{{font-size:12.8px;color:{INK2};}}
-.kpi .proxy{{font-size:12.2px;color:{MUTED};margin-top:14px;padding-top:14px;
-           border-top:1px solid {RULE};}}
+.badge.partial{{color:{TELCO_L};}} .badge.none{{color:{CABLE_L};}}
+.kpi .miss{{font-size:12.8px;color:{ONVOID2};}}
+.kpi .proxy{{font-size:12.2px;color:rgba(220,234,242,.45);margin-top:14px;
+           padding-top:14px;border-top:1px solid rgba(220,234,242,.14);}}
 
 /* ══ MOCK ═════════════════════════════════════════════════════ */
 .mockwrap{{border:1px dashed rgba(176,58,42,.45);padding:14px 18px 18px;margin-top:26px;
@@ -373,8 +429,9 @@ code{{font-family:{MONO};font-size:12px;background:{PAPER2};padding:2px 6px;
 .note b{{color:{INK};}}
 
 /* ══ 頁尾 ═════════════════════════════════════════════════════ */
-.foot{{background:{INK};color:#9db3c4;margin-top:0;padding:40px 0;
-     font-family:{MONO};font-size:12px;line-height:1.95;}}
+.foot{{background:{VOID};color:rgba(220,234,242,.55);margin-top:0;padding:44px 0;
+     font-family:{MONO};font-size:12px;line-height:1.95;
+     border-top:1px solid rgba(220,234,242,.12);}}
 .foot code{{background:rgba(255,255,255,.10);color:#cfe0ee;}}
 
 /* ══ 捲動進度：長頁面的位置感 ═══════════════════════════════════ */
@@ -405,9 +462,12 @@ a:focus-visible,summary:focus-visible{{outline:2px solid {ACCENT};outline-offset
 @media (max-width:900px){{
   .stats,.kpis{{grid-template-columns:1fr 1fr;}}
   .stat,.kpi{{padding-right:18px;}}
-  .masthead{{padding-top:52px;}}
-  .masthead .meta{{padding-bottom:150px;}}
-  .blk{{padding:46px 0;}}
+  .mast-type{{padding:52px 0 32px;grid-template-columns:1fr;gap:34px;}}
+  .readout{{border-left:0;padding-left:0;
+          border-top:1px solid rgba(220,234,242,.20);padding-top:26px;}}
+  .herofig{{height:170px;}}
+  .sec{{padding:46px 0;}}
+  .sec.dark{{padding:52px 0 58px;}}
 }}
 """
 
@@ -458,6 +518,9 @@ def build(rows) -> str:
     # 與圖上的資料靜靜地分家，而那正是本專案定義的失敗模式。
     a, z = next(r for r in rows if r.ym == "2019-01"), last
     delta = z.telco_share - a.telco_share
+    # hero 的軌跡圖畫全期：只畫 2019 之後那一段的話，兩條線幾乎平行，
+    # 收窄看不出來。全期的形狀才有戲，代價是圖的左端與右側讀數的起算點不同——
+    # 所以圖上補一條虛線標出 2019-01，並在圖例寫明它是什麼。
     years = round((int(z.ym[:4]) - int(a.ym[:4])) + (int(z.ym[5:]) - int(a.ym[5:])) / 12)
 
     # 2020-01 斷點對占比的單月衝擊，以及它佔全期變化的比例——同樣由資料算，不寫死。
@@ -485,27 +548,40 @@ def build(rows) -> str:
 <div id="prog"></div>
 
 <header class="masthead">
-  {hero_svg(rows, TELCO_C, CABLE_C)}
-  <div class="wrap">
-    <span class="eyebrow">中華電信固網 2026 公開目標追蹤板</span>
-    <h1>電信陣營的固網份額，<em>{years} 年掉了 {abs(delta):.0f} 個百分點</em></h1>
+  <div class="wrap mast-type">
+    <div class="mast-say">
+      <span class="eyebrow">中華電信固網 2026 公開目標追蹤板</span>
+      <h1>電信陣營的固網份額，<em>{years} 年掉了 {abs(delta):.0f} 個百分點</em></h1>
+      <p class="standfirst">
+        政府公開統計、可驗證，也是中華電信在 2026 年打這場降價保衛戰的原因。
+        <b>這是技術陣營層級的代理指標，不是中華電信自身市占</b>——公開統計沒有業者別。
+      </p>
+    </div>
     <div class="readout">
+      <span class="rlab">{a.ym}</span>
       <span class="from">{a.telco_share:.1f}%</span>
-      <span class="arrow">→</span>
+      <span class="rlab">{z.ym}</span>
       <span class="to">{z.telco_share:.1f}%</span>
       <span class="delta">{delta:+.2f} pp</span>
+      <span class="rsrc">NCC／data.gov.tw<br>{first.ym} — {last.ym}　共 {len(rows)} 個月</span>
     </div>
-    <p class="standfirst">
-      政府公開統計、可驗證，也是中華電信在 2026 年打這場降價保衛戰的原因。
-      <b>這是技術陣營層級的代理指標，不是中華電信自身市占</b>——公開統計沒有業者別。
-    </p>
-    <p class="meta">NCC／data.gov.tw　·　{first.ym} — {last.ym}　·　{len(rows)} 個月</p>
+  </div>
+  <div class="wrap mast-fig">
+    {hero_svg(rows, TELCO_L, CABLE_L, anchor_ym=a.ym)}
+    <div class="figscale">
+      <span>{first.ym}</span>
+      <span class="figkey">
+        <i style="color:{TELCO_L}">電信陣營</i><i style="color:{CABLE_L}">Cable</i>
+        <em>虛線＝右側讀數的起算點 {a.ym}</em>
+      </span>
+      <span>{last.ym}</span>
+    </div>
   </div>
 </header>
 
-<main class="wrap">
+<main>
 
-<section class="sec reveal">
+<section class="sec reveal"><div class="wrap">
   <div class="card">{fig_main}</div>
   <div class="limits">
     <b>這張圖的三個限制（不放附錄，就寫在圖旁）</b>
@@ -521,17 +597,17 @@ def build(rows) -> str:
       成因未能證實，查證過程見文末方法說明。
     </div>
   </div>
-</section>
+</div></section>
 
-<section class="sec reveal">
+<section class="sec dark reveal"><div class="wrap">
   <span class="eyebrow">可追蹤性診斷</span>
   <h2>四個公開目標，用公開資料一個都追不到</h2>
   <p class="sectionnote"><b>個人家庭分公司總經理</b>胡學海 2026-03-18 公開宣布（來源：經濟日報／MoneyDJ）。
   每張卡的訊號格顯示這個目標能追到多少：亮兩格代表只追得到陣營層級的代理，全暗代表公開資料沒有。</p>
   {kpi_cards()}
-</section>
+</div></section>
 
-<section class="sec reveal">
+<section class="sec reveal"><div class="wrap">
   <span class="eyebrow">需要哪些內部欄位</span>
   <h2>如果有內部資料，這個板會長什麼樣</h2>
   <div class="mockwrap">
@@ -543,9 +619,9 @@ def build(rows) -> str:
     </div>
     {fig_mock}
   </div>
-</section>
+</div></section>
 
-<section class="sec reveal">
+<section class="sec reveal"><div class="wrap">
   <span class="eyebrow">方法</span>
   <h2>資料怎麼來、判準怎麼定、為什麼不做因果推論</h2>
 
@@ -597,7 +673,7 @@ def build(rows) -> str:
           其餘約 {residual:+.1f} 個百分點仍為實在的趨勢。</li>
     </ol>
   </div>
-</section>
+</div></section>
 
 </main>
 

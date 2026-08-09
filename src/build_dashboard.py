@@ -31,18 +31,46 @@ OUT.mkdir(parents=True, exist_ok=True)
 # 預設不內嵌，理由見 build() 內的註解。
 INLINE = "--inline" in sys.argv
 
-# ── 調色盤（dataviz 參考實例，validate_palette.js 全 PASS）────────────────
-# 兩陣營是**兩個實體**，所以用 categorical 兩槽，不是同色相深淺。
-#   node validate_palette.js "#2a78d6,#eb6834" --mode light → ALL CHECKS PASS
-#   （最差相鄰 CVD ΔE 24.7、常視覺 ΔE 33.6，門檻分別為 8 與 15）
-TELCO_C, CABLE_C = "#2a78d6", "#eb6834"
-SURFACE, PLANE = "#fcfcfb", "#f9f9f7"
-INK, INK2, MUTED = "#0b0b0b", "#52514e", "#898781"
-GRID, AXIS = "#e1e0d9", "#c3c2b7"
-# 事件時點＝中性次要墨色；資料斷點＝status critical（4.68:1），並一律附 ⚠ 圖示與文字標籤，
+# ══════════════════════════════════════════════════════════════════════════
+#  視覺方向：**量測儀表**（2026-08-09 改版）
+#
+#  本專案的論點是「我能看到多少、看不到什麼」——那是一個關於**可見性與盲區**
+#  的命題。所以介面做成一塊深色儀表面：**能測到的發亮，測不到的暗著**。
+#  四張 KPI 卡本來就是兩盞亮、兩盞暗——把專案的論點直接變成視覺系統，
+#  而不是在報告上加一層裝飾。
+#
+#  刻意避開兩種常見的預設樣貌：不用「黑底＋螢光綠」，也不用原本那種
+#  「米白＋髮絲線的報告紙」。用深海軍藍的儀表面，數據一律走等寬字。
+# ══════════════════════════════════════════════════════════════════════════
+
+# 兩陣營是**兩個實體**，用 categorical 兩槽，不是同色相深淺。
+#   node validate_palette.js "#3987e5,#d95926" --mode dark --surface "#0f1720"
+#   → ALL CHECKS PASS（最差相鄰 CVD ΔE 26.8、常視覺 ΔE 31.8，門檻 8 與 15）
+TELCO_C, CABLE_C = "#3987e5", "#d95926"
+
+PLANE = "#0a0f16"        # 頁面底：儀表機殼
+SURFACE = "#0f1720"      # 卡片面：量測視窗
+RAISED = "#16202c"       # 抬升面：卡片內的資料區
+HAIR = "rgba(255,255,255,0.09)"      # 髮絲分隔線
+HAIR2 = "rgba(255,255,255,0.05)"
+
+INK = "#e6edf5"          # 主要文字
+INK2 = "#9fb0c4"         # 次要文字
+MUTED = "#67788d"        # 標籤、軸
+
+GRID = "rgba(255,255,255,0.065)"
+AXIS = "rgba(255,255,255,0.20)"
+
+# 事件時點＝中性；資料斷點＝警示紅，一律附 ⚠ 圖示與文字標籤，
 # 不讓顏色單獨承載意義。兩者刻意用不同線型：事件實線、斷點虛線。
-EVENT_C, BREAK_C = "#52514e", "#d03b3b"
-FONT = 'system-ui, -apple-system, "Segoe UI", "Microsoft JhengHei", sans-serif'
+EVENT_C, BREAK_C = "#8fa3ba", "#ff6b6b"
+LIT = "#4ade80"          # 「測得到」的訊號綠，只用於 KPI 訊號格
+
+FONT = ('system-ui, -apple-system, "Segoe UI", "Noto Sans TC", '
+        '"Microsoft JhengHei", sans-serif')
+# 數據一律等寬：儀表的母語是等寬字，而且數字對齊本來就該用它。
+MONO = ('ui-monospace, "Cascadia Mono", "SF Mono", Consolas, '
+        '"Noto Sans Mono CJK TC", monospace')
 
 # 事件時點（規格第九節第 5 條：**僅視覺標記，不估計任何效果**）
 EVENTS = [
@@ -208,72 +236,147 @@ def mock_figure() -> go.Figure:
 
 CSS = f"""
 *{{box-sizing:border-box;}}
-body{{margin:0;background:{PLANE};color:{INK};font-family:{FONT};line-height:1.7;}}
-.wrap{{max-width:1180px;margin:0 auto;padding:40px 22px 80px;}}
-h1{{font-size:27px;font-weight:660;margin:0 0 10px;letter-spacing:-.015em;line-height:1.35;}}
-h2{{font-size:19px;font-weight:640;margin:52px 0 8px;letter-spacing:-.01em;}}
-h3{{font-size:14.5px;font-weight:640;margin:22px 0 6px;}}
-.lede{{font-size:15px;color:{INK2};margin:0 0 4px;}}
-.card{{background:{SURFACE};border:1px solid rgba(11,11,11,.10);border-radius:11px;
-      padding:10px 10px 6px;margin-top:18px;
-      /* 圖表在自己的容器裡橫向捲動，頁面本體永不橫向捲動。
-         在 375px 手機上把兩格子圖硬壓進去，軸標籤會擠成看不懂的東西——
-         給最小寬度讓使用者左右滑，比壓扁誠實。 */
-      overflow-x:auto;-webkit-overflow-scrolling:touch;}}
-.card > div{{min-width:700px;}}
-.scrollhint{{display:none;font-size:11.5px;color:{MUTED};margin:6px 2px 0;}}
-.hero{{background:{SURFACE};border:1px solid rgba(11,11,11,.10);border-radius:11px;
-      padding:22px 26px;margin:20px 0 0;}}
-.figure{{font-size:44px;font-weight:680;letter-spacing:-.02em;color:{TELCO_C};line-height:1.15;}}
-.figure small{{font-size:16px;font-weight:600;color:{INK2};}}
-.note{{font-size:12.8px;color:{INK2};margin-top:14px;line-height:1.75;}}
-.note b{{color:{INK};}}
-.limits{{background:{SURFACE};border:1px solid rgba(11,11,11,.10);border-left:3px solid {MUTED};
-        border-radius:0 9px 9px 0;padding:14px 18px;margin-top:14px;font-size:13px;color:{INK2};}}
-.limits li{{margin:5px 0;}} .limits ol{{margin:6px 0 0;padding-left:20px;}}
-.kpis{{display:grid;grid-template-columns:repeat(auto-fit,minmax(255px,1fr));gap:14px;margin-top:18px;}}
-.kpi{{background:{SURFACE};border:1px solid rgba(11,11,11,.10);border-radius:11px;padding:16px 18px;
-     display:flex;flex-direction:column;}}
-.kpi.partial{{border-top:3px solid #fab219;}}
-.kpi.none{{border-top:3px solid {BREAK_C};}}
-.kpi .idx{{font-size:11.5px;color:{MUTED};font-weight:600;letter-spacing:.06em;}}
-.kpi .goal{{font-size:17px;font-weight:600;margin:5px 0 12px;line-height:1.5;}}
-.kpi .goal .sub{{font-size:12.5px;color:{MUTED};font-weight:500;}}
-.badge{{display:inline-block;font-size:12.5px;font-weight:640;padding:3px 10px;border-radius:999px;
-       margin-bottom:11px;align-self:flex-start;}}
-.badge.partial{{background:rgba(250,178,25,.16);color:#7a5300;}}
-.badge.none{{background:rgba(208,59,59,.12);color:#9c2020;}}
-.kpi .miss{{font-size:12.8px;color:{INK2};}}
-.kpi .proxy{{font-size:12.4px;color:{MUTED};margin-top:9px;padding-top:9px;
-            border-top:1px solid {GRID};}}
-.mockwrap{{border:2px dashed {BREAK_C};border-radius:12px;padding:6px 10px 10px;
-          background:repeating-linear-gradient(45deg,rgba(208,59,59,.035) 0 12px,transparent 12px 24px);}}
-.mockbar{{background:{BREAK_C};color:#fff;font-size:12.5px;font-weight:660;letter-spacing:.04em;
-         padding:6px 14px;border-radius:7px;display:inline-block;margin:10px 0 4px;}}
-table{{border-collapse:collapse;font-size:12.8px;margin-top:10px;width:100%;
-      font-variant-numeric:tabular-nums;}}
-th,td{{border-bottom:1px solid {GRID};padding:7px 12px 7px 0;text-align:left;vertical-align:top;}}
-th{{color:{MUTED};font-weight:600;}}
-code{{font-size:12px;background:rgba(11,11,11,.05);padding:1px 5px;border-radius:4px;}}
-.foot{{font-size:12px;color:{MUTED};margin-top:44px;padding-top:16px;border-top:1px solid {GRID};}}
+html{{-webkit-text-size-adjust:100%;}}
+body{{
+  margin:0;background:{PLANE};color:{INK};font-family:{FONT};
+  line-height:1.72;letter-spacing:.005em;
+  /* 儀表機殼：頂端一道極淡的訊號輝光，其餘沉下去 */
+  background-image:
+    radial-gradient(1100px 420px at 22% -8%, rgba(57,135,229,.16), transparent 62%),
+    radial-gradient(760px 320px at 88% 2%, rgba(217,89,38,.07), transparent 60%);
+  background-attachment:fixed;
+}}
+.wrap{{max-width:1180px;margin:0 auto;padding:56px 22px 96px;}}
 
-/* ── 行動裝置（QR 掃進來的主要情境）──────────────────────────────
+/* ── 字級：display 用系統無襯線收緊字距，數據一律等寬 ────────────── */
+h1{{font-size:clamp(28px,4.4vw,44px);font-weight:800;margin:0 0 14px;
+   letter-spacing:-.028em;line-height:1.22;}}
+h2{{font-size:20px;font-weight:700;margin:0 0 6px;letter-spacing:-.015em;}}
+/* 區塊間距掛在眉標上而不是 h2 上——否則眉標會被留在上一段的尾巴，
+   跟自己的標題拆散（實測過一次，看起來像孤字）。 */
+.wrap > .eyebrow{{margin-top:68px;}}
+.wrap > .eyebrow:first-child{{margin-top:0;}}
+h3{{font-size:14.5px;font-weight:700;margin:26px 0 6px;letter-spacing:-.005em;}}
+.lede{{font-size:14px;color:{MUTED};margin:0;font-family:{MONO};
+      letter-spacing:0;line-height:1.8;}}
+.sectionnote{{font-size:14.5px;color:{INK2};margin:8px 0 0;max-width:70ch;}}
+
+/* ── 眉標：不是裝飾，標的是「這一段在回答哪個問題」 ──────────────── */
+.eyebrow{{font-family:{MONO};font-size:11.5px;letter-spacing:.16em;
+        text-transform:uppercase;color:{MUTED};display:block;margin-bottom:10px;}}
+
+/* ── Hero：量測讀數 ───────────────────────────────────────────── */
+.hero{{position:relative;background:linear-gradient(160deg,{SURFACE},{PLANE} 130%);
+     border:1px solid {HAIR};border-radius:16px;padding:34px 34px 30px;margin-top:28px;
+     overflow:hidden;}}
+.hero::before{{content:"";position:absolute;inset:0 auto auto 0;width:3px;height:100%;
+             background:linear-gradient(180deg,{TELCO_C},{CABLE_C});}}
+.readout{{display:flex;align-items:baseline;gap:18px;flex-wrap:wrap;
+        font-family:{MONO};font-variant-numeric:tabular-nums;}}
+.readout .from{{font-size:clamp(34px,6vw,60px);font-weight:700;color:{INK2};
+              letter-spacing:-.03em;line-height:1;}}
+.readout .arrow{{font-size:clamp(22px,3.4vw,34px);color:{MUTED};line-height:1;}}
+.readout .to{{font-size:clamp(40px,7.4vw,74px);font-weight:800;color:{TELCO_C};
+            letter-spacing:-.035em;line-height:1;
+            text-shadow:0 0 42px rgba(57,135,229,.42);}}
+.delta{{display:inline-flex;align-items:center;gap:7px;margin-left:2px;padding:5px 12px;
+      border:1px solid rgba(217,89,38,.42);border-radius:999px;background:rgba(217,89,38,.10);
+      color:#f0a07a;font-family:{MONO};font-size:14px;font-weight:600;letter-spacing:0;}}
+.herotext{{margin-top:20px;padding-top:18px;border-top:1px solid {HAIR2};
+         font-size:14.5px;color:{INK2};max-width:74ch;}}
+.herotext b{{color:{INK};font-weight:650;}}
+
+/* ── 卡片與圖表 ──────────────────────────────────────────────── */
+.card{{background:{SURFACE};border:1px solid {HAIR};border-radius:14px;
+     padding:14px 12px 8px;margin-top:20px;
+     /* 圖表在自己的容器裡橫向捲動，頁面本體永不橫向捲動。 */
+     overflow-x:auto;-webkit-overflow-scrolling:touch;}}
+.card > div{{min-width:700px;}}
+.scrollhint{{display:none;font-size:12px;color:{MUTED};margin:8px 2px 0;font-family:{MONO};}}
+
+/* ── 限制框：警戒帶，不是引言區 ───────────────────────────────── */
+.limits{{background:{RAISED};border:1px solid {HAIR};border-left:3px solid {MUTED};
+       border-radius:0 12px 12px 0;padding:18px 22px;margin-top:18px;
+       font-size:13.5px;color:{INK2};}}
+.limits b{{color:{INK};}}
+.limits li{{margin:7px 0;}} .limits ol{{margin:8px 0 0;padding-left:22px;}}
+.limits ol::marker{{color:{MUTED};}}
+.breaknote{{margin-top:14px;padding-top:12px;border-top:1px solid {HAIR2};}}
+.breaknote b{{color:{BREAK_C};}}
+
+/* ── KPI 卡：本頁的招牌元素 ───────────────────────────────────
+   四格訊號條把「可追蹤性」畫出來——亮幾格＝這個目標追得到多少。
+   ⚠ 兩格亮、❌ 零格亮。顏色、格數、圖示、文字四重編碼，不靠顏色單獨承載。 */
+.kpis{{display:grid;grid-template-columns:repeat(auto-fit,minmax(258px,1fr));
+     gap:16px;margin-top:22px;}}
+.kpi{{position:relative;background:{SURFACE};border:1px solid {HAIR};
+    border-radius:14px;padding:20px 20px 18px;display:flex;flex-direction:column;
+    transition:border-color .25s ease, transform .25s ease;}}
+.kpi:hover{{border-color:rgba(255,255,255,.2);transform:translateY(-2px);}}
+.kpi .idx{{font-family:{MONO};font-size:11px;letter-spacing:.18em;color:{MUTED};}}
+.signal{{display:flex;gap:4px;margin:12px 0 14px;}}
+.seg{{height:5px;flex:1;border-radius:2px;background:rgba(255,255,255,.09);}}
+.kpi.partial .seg.on{{background:{LIT};box-shadow:0 0 12px rgba(74,222,128,.55);}}
+.kpi.none .seg{{background:rgba(255,255,255,.055);}}
+.kpi .goal{{font-size:17.5px;font-weight:650;margin:0 0 10px;line-height:1.5;}}
+.kpi .goal .sub{{display:block;font-size:12.5px;color:{MUTED};font-weight:400;
+               font-family:{MONO};margin-top:5px;}}
+.badge{{display:inline-block;font-size:12px;font-weight:650;padding:4px 11px;
+      border-radius:999px;margin-bottom:12px;align-self:flex-start;font-family:{MONO};}}
+.badge.partial{{background:rgba(74,222,128,.13);color:{LIT};
+              border:1px solid rgba(74,222,128,.3);}}
+.badge.none{{background:rgba(255,107,107,.11);color:{BREAK_C};
+           border:1px solid rgba(255,107,107,.28);}}
+.kpi .miss{{font-size:13px;color:{INK2};}}
+.kpi .proxy{{font-size:12.5px;color:{MUTED};margin-top:12px;padding-top:12px;
+           border-top:1px solid {HAIR2};}}
+
+/* ── MOCK：明確標示為未接上的區域 ─────────────────────────────── */
+.mockwrap{{border:1px dashed rgba(255,107,107,.42);border-radius:14px;
+         padding:10px 14px 14px;margin-top:20px;background:rgba(255,107,107,.035);}}
+.mockbar{{background:rgba(255,107,107,.15);border:1px solid rgba(255,107,107,.38);
+        color:{BREAK_C};font-size:12.5px;font-weight:700;letter-spacing:.04em;
+        padding:7px 15px;border-radius:8px;display:inline-block;margin:8px 0 6px;
+        font-family:{MONO};}}
+
+/* ── 表格與程式碼 ────────────────────────────────────────────── */
+table{{border-collapse:collapse;font-size:13px;margin-top:12px;width:100%;
+     font-variant-numeric:tabular-nums;}}
+th,td{{border-bottom:1px solid {HAIR2};padding:9px 14px 9px 0;text-align:left;
+     vertical-align:top;}}
+th{{color:{MUTED};font-weight:600;font-family:{MONO};font-size:11.5px;
+   letter-spacing:.06em;text-transform:uppercase;}}
+code{{font-family:{MONO};font-size:12.5px;background:rgba(255,255,255,.06);
+    padding:2px 6px;border-radius:5px;color:{INK2};}}
+.note{{font-size:13.5px;color:{INK2};margin-top:14px;max-width:78ch;}}
+.note b{{color:{INK};}}
+.foot{{font-size:12.5px;color:{MUTED};margin-top:56px;padding-top:20px;
+     border-top:1px solid {HAIR};font-family:{MONO};line-height:1.85;}}
+
+/* ── 進場：一次性、克制，且尊重減少動態偏好 ───────────────────── */
+@keyframes rise{{from{{opacity:0;transform:translateY(14px);}}
+                to{{opacity:1;transform:none;}}}}
+.hero,.card,.kpi,.mockwrap{{animation:rise .6s cubic-bezier(.22,.7,.3,1) both;}}
+.card{{animation-delay:.06s;}}
+.kpi:nth-child(1){{animation-delay:.04s;}} .kpi:nth-child(2){{animation-delay:.09s;}}
+.kpi:nth-child(3){{animation-delay:.14s;}} .kpi:nth-child(4){{animation-delay:.19s;}}
+@media (prefers-reduced-motion: reduce){{
+  *{{animation:none !important;transition:none !important;}}
+}}
+a:focus-visible,summary:focus-visible{{outline:2px solid {TELCO_C};outline-offset:3px;}}
+
+/* ── 行動裝置（QR 掃進來的主要情境）─────────────────────────────
    375px（iPhone SE）／390px（iPhone 14）實測後加入。
    先前所有碰撞檢查只跑 900／1100／1400px，完全沒涵蓋這一段。 */
 @media (max-width: 640px) {{
-  .wrap {{ padding: 22px 14px 56px; }}
-  h1 {{ font-size: 22px; }}
-  h2 {{ font-size: 17px; margin-top: 38px; }}
-  .lede {{ font-size: 14px; }}
-  .hero {{ padding: 16px 16px; }}
-  .figure {{ font-size: 30px; }}
-  .figure small {{ display: block; margin-top: 4px; font-size: 14px; }}
+  .wrap {{ padding: 30px 15px 64px; }}
+  h2 {{ font-size: 18px; margin-top: 44px; }}
+  .hero {{ padding: 24px 20px 22px; border-radius: 14px; }}
+  .readout {{ gap: 10px; }}
   .scrollhint {{ display: block; }}
   .kpis {{ grid-template-columns: 1fr; }}
-  .limits {{ padding: 12px 14px; }}
-  .mockwrap {{ padding: 6px 8px 8px; }}
-  table {{ font-size: 12px; }}
-  /* 長字串（URL、路徑）在窄螢幕會把版面撐開 */
+  .limits {{ padding: 15px 16px; }}
+  table {{ font-size: 12.5px; }}
   code {{ word-break: break-all; }}
 }}
 """
@@ -293,11 +396,23 @@ WHY_NO_CAUSAL = """
 
 
 def kpi_cards() -> str:
+    """四張卡＋四格訊號條。
+
+    訊號條是本頁的招牌元素：**亮幾格＝這個目標追得到多少**。
+    ⚠️ 部分可追蹤亮兩格、❌ 完全追不到零格。
+    顏色、格數、圖示、文字四重編碼——顏色從不單獨承載意義。
+    """
+    lit_by_state = {"partial": 2, "none": 0}
     out = []
     for k in KPIS:
+        lit = lit_by_state[k["state"]]
+        segs = "".join(f'<span class="seg{" on" if i < lit else ""}"></span>'
+                       for i in range(4))
         out.append(f"""
         <div class="kpi {k['state']}">
           <div class="idx">目標 {k['n']}</div>
+          <div class="signal" role="img"
+               aria-label="可追蹤性 {lit} / 4">{segs}</div>
           <div class="goal">{k['goal']}</div>
           <span class="badge {k['state']}">{k['badge']}</span>
           <div class="miss"><b>缺什麼資料：</b>{k['miss']}</div>
@@ -339,16 +454,20 @@ def build(rows) -> str:
 <style>{CSS}</style>
 <div class="wrap">
 
+<span class="eyebrow">中華電信固網 2026 公開目標追蹤板</span>
 <h1>台灣固網市場，電信陣營的份額 {years} 年掉了 {abs(delta):.0f} 個百分點</h1>
-<p class="lede">中華電信固網 2026 公開目標追蹤板　·　資料來源：NCC／data.gov.tw 公開統計　·
-資料期間 {first.ym} ~ {last.ym}</p>
+<p class="lede">NCC／data.gov.tw 公開統計　·　{first.ym} — {last.ym}　·　{len(rows)} 個月</p>
 
 <div class="hero">
-  <div class="figure">{a.telco_share:.1f}% → {z.telco_share:.1f}%　<small>{years} 年 {delta:+.2f} 個百分點</small></div>
-  <div class="note">
-    這是政府公開統計、可驗證的硬數字，也是<b>為什麼中華電信要在 2026 年打這場降價保衛戰</b>。<br>
-    <b>但請先記住這個數字的身分</b>：它是<b>技術陣營層級的代理指標</b>，不是中華電信自己的市占——
-    原因在下一節說明。
+  <div class="readout">
+    <span class="from">{a.telco_share:.1f}%</span>
+    <span class="arrow">→</span>
+    <span class="to">{z.telco_share:.1f}%</span>
+    <span class="delta">{delta:+.2f} pp ／ {years} 年</span>
+  </div>
+  <div class="herotext">
+    政府公開統計、可驗證，也是<b>中華電信在 2026 年打這場降價保衛戰的原因</b>。<br>
+    這個數字是<b>技術陣營層級的代理指標</b>，不是中華電信自己的市占——公開統計無業者別。
   </div>
 </div>
 
@@ -372,12 +491,14 @@ def build(rows) -> str:
   </div>
 </div>
 
-<h2>中華電信 2026 年公開了四個固網目標。我用公開資料試著追蹤，一個都追不到。</h2>
-<p class="lede"><b>個人家庭分公司總經理</b>胡學海 2026-03-18 公開宣布（來源：經濟日報／MoneyDJ）。
-<b>「追不到」不是這個專案的失敗，是它的內容</b>——它標出了公開資料的天花板在哪。</p>
+<span class="eyebrow">可追蹤性診斷</span>
+<h2>四個公開目標，用公開資料一個都追不到</h2>
+<p class="sectionnote"><b>個人家庭分公司總經理</b>胡學海 2026-03-18 公開宣布（來源：經濟日報／MoneyDJ）。
+下方每張卡的訊號格顯示這個目標能追到多少——亮兩格是只追得到陣營層級的代理，全暗是公開資料完全沒有。</p>
 
 {kpi_cards()}
 
+<span class="eyebrow">需要哪些內部欄位</span>
 <h2>如果我有內部資料，這個板會長什麼樣</h2>
 <div class="mockwrap">
   <div class="mockbar">⚠ MOCK — 以下全部是假資料，僅示範版面與所需欄位，不代表任何真實數值</div>
@@ -389,7 +510,8 @@ def build(rows) -> str:
   {fig_mock}
 </div>
 
-<h2>方法說明</h2>
+<span class="eyebrow">方法</span>
+<h2>資料怎麼來、判準怎麼定、為什麼不做因果推論</h2>
 
 <h3>資料來源</h3>
 <table>

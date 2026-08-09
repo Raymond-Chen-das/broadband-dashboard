@@ -22,6 +22,7 @@ import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 
 from compute_metrics import fetch_metrics
+from hero_svg import hero_svg
 
 ROOT = Path(__file__).resolve().parent.parent
 OUT = ROOT / "dashboard"
@@ -51,20 +52,25 @@ INLINE = "--inline" in sys.argv
 # 兩陣營是**兩個實體**，用 categorical 兩槽，不是同色相深淺。
 #   node validate_palette.js "#2a78d6,#eb6834" --mode light --surface "#f2f8fc"
 #   → ALL CHECKS PASS（最差相鄰 CVD ΔE 24.7、常視覺 ΔE 33.6，門檻 8 與 15）
+# 資料色：兩陣營是兩個實體，categorical 兩槽。圖畫在白卡上。
+#   node validate_palette.js "#2a78d6,#eb6834" --mode light → ALL CHECKS PASS
 TELCO_C, CABLE_C = "#2a78d6", "#eb6834"
+CABLE_D = "#a8420c"                       # 橘的深階，供文字用（白底對比足夠）
+ACCENT, ACCENT_D = "#2a78d6", "#1b5590"
 
-PLANE = "#dce9f3"        # 頁面底：水藍機殼
-SURFACE = "#f2f8fc"      # 卡片面：近白冷調
-RAISED = "#e8f1f8"       # 抬升面：卡片內的資料區
-HAIR = "rgba(20,54,84,0.14)"       # 髮絲分隔線（冷調，不是純黑）
-HAIR2 = "rgba(20,54,84,0.08)"
+PAPER = "#eef2f6"        # 紙：冷調，上面鋪細方格
+PAPER2 = "#e3eaf1"       # 次階紙：引用區、表格 hover
+CARD = "#ffffff"         # 圖表卡
+RULE = "rgba(15,35,51,0.16)"
 
-INK = "#0d1f2d"          # 主要文字：深海軍藍而非純黑，與底色同一家族
-INK2 = "#3d5568"         # 次要文字
-MUTED = "#6b8299"        # 標籤、軸
+INK = "#0f2333"          # 主墨：深海軍藍，不用純黑
+INK2 = "#43596d"
+MUTED = "#7b8fa3"
 
-GRID = "rgba(20,54,84,0.10)"
-AXIS = "rgba(20,54,84,0.26)"
+# Plotly 圖畫在白卡上
+SURFACE = CARD
+GRID = "rgba(15,35,51,0.09)"
+AXIS = "rgba(15,35,51,0.26)"
 
 # 事件時點＝中性；資料斷點＝警示紅，一律附 ⚠ 圖示與文字標籤，
 # 不讓顏色單獨承載意義。兩者刻意用不同線型：事件實線、斷點虛線。
@@ -73,11 +79,16 @@ EVENT_C, BREAK_C = "#3d5568", "#c0392b"
 # 而藍正是那份資料本身的顏色。綠會被讀成「達標」，那是另一個意思。
 LIT = "#2a78d6"
 
-FONT = ('system-ui, -apple-system, "Segoe UI", "Noto Sans TC", '
+# 三個角色的字體，全部走系統字——載外部字型會讓頁面失去離線開啟能力。
+# 標題用**襯線**：整頁的個性由它承擔，而不是把無襯線放大了事。
+SERIF = ('"Noto Serif TC", "Source Han Serif TC", "Songti TC", '
+         '"PMingLiU", Georgia, "Times New Roman", serif')
+SANS = ('system-ui, -apple-system, "Segoe UI", "Noto Sans TC", '
         '"Microsoft JhengHei", sans-serif')
-# 數據一律等寬：儀表的母語是等寬字，而且數字對齊本來就該用它。
+# 數據一律等寬：數字對齊本來就該用它。
 MONO = ('ui-monospace, "Cascadia Mono", "SF Mono", Consolas, '
         '"Noto Sans Mono CJK TC", monospace')
+FONT = SANS      # Plotly 內文沿用無襯線
 
 # 事件時點（規格第九節第 5 條：**僅視覺標記，不估計任何效果**）
 EVENTS = [
@@ -248,145 +259,155 @@ def mock_figure() -> go.Figure:
 
 CSS = f"""
 *{{box-sizing:border-box;}}
-html{{-webkit-text-size-adjust:100%;}}
-body{{
-  margin:0;background:{PLANE};color:{INK};font-family:{FONT};
-  line-height:1.75;letter-spacing:.005em;
-  /* 水藍機殼：頂端一道極淡的冷光，把視線推向 hero */
-  background-image:
-    radial-gradient(1200px 460px at 20% -10%, rgba(255,255,255,.85), transparent 64%),
-    radial-gradient(820px 340px at 92% 0%, rgba(42,120,214,.10), transparent 62%);
-  background-attachment:fixed;
-}}
-.wrap{{max-width:1180px;margin:0 auto;padding:56px 22px 96px;}}
+html{{-webkit-text-size-adjust:100%;scroll-behavior:smooth;}}
+body{{margin:0;background:{PAPER};color:{INK};font-family:{SANS};
+     line-height:1.72;letter-spacing:.005em;}}
+/* 細方格紋理：訊號圖紙的暗示，不是裝飾用的雜訊 */
+body::before{{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
+  background-image:linear-gradient(rgba(15,35,51,.045) 1px,transparent 1px),
+                   linear-gradient(90deg,rgba(15,35,51,.045) 1px,transparent 1px);
+  background-size:34px 34px;}}
+.wrap{{max-width:1120px;margin:0 auto;padding:0 26px;}}
 
-/* ── 字級：display 收緊字距，數據一律等寬 ────────────────────── */
-h1{{font-size:clamp(28px,4.4vw,44px);font-weight:800;margin:0 0 14px;
-   letter-spacing:-.028em;line-height:1.25;}}
-h2{{font-size:20px;font-weight:700;margin:0 0 6px;letter-spacing:-.015em;}}
-h3{{font-size:14.5px;font-weight:700;margin:26px 0 6px;}}
-.lede{{font-size:13.5px;color:{MUTED};margin:0;font-family:{MONO};
-      letter-spacing:0;line-height:1.85;}}
-.sectionnote{{font-size:14.5px;color:{INK2};margin:8px 0 0;max-width:72ch;}}
+/* ══ 眉標：標的是「這一段回答哪個問題」 ═══════════════════════════ */
+.eyebrow{{font-family:{MONO};font-size:11px;letter-spacing:.28em;text-transform:uppercase;
+        color:{ACCENT_D};display:block;margin-bottom:16px;font-weight:600;}}
+
+/* ══ HERO：發現本身就是 hero ════════════════════════════════════
+   不是「大數字＋標籤＋漸層」那種模板解。兩條陣營軌跡橫貫整個 hero，
+   中間逐年收窄的缺口就是標題講的那 9 個百分點。資料與主圖同源。 */
+.masthead{{position:relative;padding:76px 0 0;border-bottom:1.5px solid {INK};
+         overflow:hidden;}}
+.herofig{{position:absolute;left:0;right:0;bottom:0;width:100%;height:250px;
+        opacity:.55;}}
+.masthead .wrap{{position:relative;z-index:1;}}
+h1{{font-family:{SERIF};font-size:clamp(2.6rem,6.6vw,5.2rem);font-weight:900;
+   line-height:.97;letter-spacing:-.022em;margin:0 0 22px;max-width:19ch;}}
+h1 em{{font-style:normal;color:{ACCENT_D};}}
+.standfirst{{font-size:16px;color:{INK2};max-width:60ch;margin:0 0 30px;}}
+.standfirst b{{color:{INK};font-weight:650;}}
+
+.readout{{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;
+        font-family:{MONO};font-variant-numeric:tabular-nums;margin:0 0 14px;}}
+.readout .from{{font-size:clamp(1.6rem,3.4vw,2.6rem);font-weight:600;color:{MUTED};
+              letter-spacing:-.03em;line-height:1;}}
+.readout .arrow{{font-size:1.3rem;color:{MUTED};line-height:1;}}
+.readout .to{{font-size:clamp(2.6rem,6vw,4.4rem);font-weight:800;color:{INK};
+            letter-spacing:-.04em;line-height:1;}}
+.delta{{font-family:{MONO};font-size:14px;font-weight:650;color:{CABLE_D};
+      border-bottom:2px solid {CABLE_C};padding-bottom:2px;}}
+.masthead .meta{{font-family:{MONO};font-size:12px;color:{MUTED};letter-spacing:.02em;
+               padding:0 0 150px;}}
+
+/* ══ 區塊：用線分隔，不是到處堆盒子 ═══════════════════════════════ */
+.blk{{padding:66px 0;border-bottom:1px solid {RULE};}}
+.blk:last-of-type{{border-bottom:0;}}
+h2{{font-family:{SERIF};font-size:clamp(1.55rem,3vw,2.3rem);font-weight:800;
+   margin:0 0 10px;letter-spacing:-.018em;line-height:1.2;}}
+h3{{font-family:{SERIF};font-size:1.15rem;font-weight:700;margin:34px 0 8px;}}
+.sectionnote{{font-size:15px;color:{INK2};margin:12px 0 0;max-width:72ch;}}
 .sectionnote b{{color:{INK};font-weight:650;}}
 
-/* ── 眉標：標的是「這一段在回答哪個問題」，不是裝飾 ──────────── */
-.eyebrow{{font-family:{MONO};font-size:11.5px;letter-spacing:.16em;
-        text-transform:uppercase;color:{TELCO_C};display:block;margin-bottom:10px;
-        font-weight:600;}}
-/* 區塊間距掛在眉標上而不是 h2 上——否則眉標會被留在上一段的尾巴，
-   跟自己的標題拆散（實測過一次，看起來像孤字）。 */
-.wrap > .eyebrow{{margin-top:72px;}}
-.wrap > .eyebrow:first-child{{margin-top:0;color:{MUTED};}}
+/* ══ 統計磚：用直線分隔，不用邊框盒 ═══════════════════════════════ */
+.stats{{display:grid;grid-template-columns:repeat(4,1fr);margin-top:34px;
+      border-top:2px solid {INK};}}
+.stat{{padding:24px 22px 22px 0;border-right:1px solid {RULE};}}
+.stat:last-child{{border-right:0;}}
+.stat .num{{font-family:{MONO};font-size:clamp(1.5rem,2.6vw,2.05rem);font-weight:700;
+          letter-spacing:-.02em;line-height:1.1;font-variant-numeric:tabular-nums;}}
+.stat .lab{{font-size:12.5px;color:{MUTED};margin-top:8px;line-height:1.55;}}
 
-/* ── Hero：量測讀數 ───────────────────────────────────────── */
-.hero{{position:relative;background:{SURFACE};
-     border:1px solid {HAIR};border-radius:16px;padding:34px 34px 30px;margin-top:28px;
-     overflow:hidden;box-shadow:0 1px 2px rgba(20,54,84,.05),
-                                0 12px 32px -12px rgba(20,54,84,.16);}}
-.hero::before{{content:"";position:absolute;inset:0 auto auto 0;width:3px;height:100%;
-             background:linear-gradient(180deg,{TELCO_C},{CABLE_C});}}
-.readout{{display:flex;align-items:baseline;gap:18px;flex-wrap:wrap;
-        font-family:{MONO};font-variant-numeric:tabular-nums;}}
-.readout .from{{font-size:clamp(34px,6vw,58px);font-weight:700;color:{MUTED};
-              letter-spacing:-.03em;line-height:1;}}
-.readout .arrow{{font-size:clamp(22px,3.4vw,32px);color:{MUTED};line-height:1;}}
-.readout .to{{font-size:clamp(40px,7.4vw,74px);font-weight:800;color:{TELCO_C};
-            letter-spacing:-.035em;line-height:1;}}
-.delta{{display:inline-flex;align-items:center;gap:7px;padding:5px 13px;
-      border:1px solid rgba(235,104,52,.40);border-radius:999px;
-      background:rgba(235,104,52,.10);color:#b04a1c;
-      font-family:{MONO};font-size:14px;font-weight:650;letter-spacing:0;}}
-.herotext{{margin-top:20px;padding-top:18px;border-top:1px solid {HAIR2};
-         font-size:14.5px;color:{INK2};max-width:74ch;}}
-.herotext b{{color:{INK};font-weight:650;}}
-
-/* ── 卡片與圖表 ──────────────────────────────────────────── */
-.card{{background:{SURFACE};border:1px solid {HAIR};border-radius:14px;
-     padding:14px 12px 8px;margin-top:20px;
-     box-shadow:0 1px 2px rgba(20,54,84,.05);
-     /* 圖表在自己的容器裡橫向捲動——瀏覽器視窗拉窄時版面才不會破。 */
-     overflow-x:auto;}}
+/* ══ 圖表 ═════════════════════════════════════════════════════ */
+.card{{background:{CARD};border:1px solid {RULE};border-radius:2px;
+     padding:16px 14px 10px;margin-top:30px;overflow-x:auto;}}
 .card > div{{min-width:860px;}}
 
-/* ── 限制框：警戒帶，不是引言區 ───────────────────────────── */
-.limits{{background:{RAISED};border:1px solid {HAIR};border-left:3px solid {MUTED};
-       border-radius:0 12px 12px 0;padding:18px 22px;margin-top:18px;
-       font-size:13.5px;color:{INK2};}}
+.limits{{border-left:3px solid {ACCENT};background:{PAPER2};
+       padding:22px 26px;margin-top:24px;font-size:13.5px;color:{INK2};}}
 .limits b{{color:{INK};}}
-.limits li{{margin:7px 0;}} .limits ol{{margin:8px 0 0;padding-left:22px;}}
-.limits ol::marker{{color:{MUTED};font-family:{MONO};}}
-.breaknote{{margin-top:14px;padding-top:12px;border-top:1px solid {HAIR2};}}
+.limits ol{{margin:12px 0 0;padding-left:22px;}} .limits li{{margin:9px 0;}}
+.limits ol::marker{{font-family:{MONO};color:{ACCENT_D};font-weight:700;}}
+.breaknote{{margin-top:18px;padding-top:14px;border-top:1px solid {RULE};}}
 .breaknote b{{color:{BREAK_C};}}
 
-/* ── KPI 卡：本頁的招牌元素 ────────────────────────────────
-   四格訊號條把「可追蹤性」畫出來——亮幾格＝這個目標追得到多少。
-   ⚠ 兩格亮、❌ 零格亮。顏色、格數、圖示、文字四重編碼。 */
-.kpis{{display:grid;grid-template-columns:repeat(auto-fit,minmax(258px,1fr));
-     gap:16px;margin-top:22px;}}
-.kpi{{position:relative;background:{SURFACE};border:1px solid {HAIR};
-    border-radius:14px;padding:20px 20px 18px;display:flex;flex-direction:column;
-    box-shadow:0 1px 2px rgba(20,54,84,.05);
-    transition:box-shadow .25s ease, transform .25s ease;}}
-.kpi:hover{{transform:translateY(-2px);
-          box-shadow:0 1px 2px rgba(20,54,84,.05),0 14px 28px -14px rgba(20,54,84,.28);}}
-.kpi .idx{{font-family:{MONO};font-size:11px;letter-spacing:.18em;color:{MUTED};}}
-.signal{{display:flex;gap:4px;margin:12px 0 14px;}}
-.seg{{height:5px;flex:1;border-radius:2px;background:rgba(20,54,84,.13);}}
-.kpi.partial .seg.on{{background:{LIT};}}
-.kpi.none .seg{{background:rgba(20,54,84,.09);}}
-.kpi .goal{{font-size:17.5px;font-weight:650;margin:0 0 10px;line-height:1.5;}}
-.kpi .goal .sub{{display:block;font-size:12.5px;color:{MUTED};font-weight:400;
-               font-family:{MONO};margin-top:5px;}}
-.badge{{display:inline-block;font-size:12px;font-weight:650;padding:4px 11px;
-      border-radius:999px;margin-bottom:12px;align-self:flex-start;font-family:{MONO};}}
-.badge.partial{{background:rgba(42,120,214,.12);color:#1d5ea8;
-              border:1px solid rgba(42,120,214,.30);}}
-.badge.none{{background:rgba(192,57,43,.10);color:{BREAK_C};
-           border:1px solid rgba(192,57,43,.28);}}
-.kpi .miss{{font-size:13px;color:{INK2};}}
-.kpi .proxy{{font-size:12.5px;color:{MUTED};margin-top:12px;padding-top:12px;
-           border-top:1px solid {HAIR2};}}
+/* ══ KPI：訊號格把「可追蹤性」畫出來 ═════════════════════════════
+   亮幾格＝這個目標追得到多少。顏色、格數、圖示、文字四重編碼。 */
+.kpis{{display:grid;grid-template-columns:repeat(4,1fr);margin-top:34px;
+     border-top:2px solid {INK};}}
+.kpi{{padding:26px 22px 24px 0;border-right:1px solid {RULE};
+    display:flex;flex-direction:column;}}
+.kpi:last-child{{border-right:0;}}
+.kpi .idx{{font-family:{MONO};font-size:10.5px;letter-spacing:.24em;color:{MUTED};}}
+.signal{{display:flex;gap:3px;margin:14px 0 16px;max-width:120px;}}
+.seg{{height:7px;flex:1;background:rgba(15,35,51,.11);}}
+.kpi.partial .seg.on{{background:{ACCENT};}}
+.kpi .goal{{font-family:{SERIF};font-size:1.2rem;font-weight:700;margin:0 0 12px;
+          line-height:1.42;}}
+.kpi .goal .sub{{display:block;font-family:{MONO};font-size:11.5px;color:{MUTED};
+               font-weight:400;margin-top:8px;letter-spacing:.02em;}}
+.badge{{font-family:{MONO};font-size:11px;font-weight:650;letter-spacing:.06em;
+      margin-bottom:14px;align-self:flex-start;}}
+.badge.partial{{color:{ACCENT_D};}} .badge.none{{color:{BREAK_C};}}
+.kpi .miss{{font-size:12.8px;color:{INK2};}}
+.kpi .proxy{{font-size:12.2px;color:{MUTED};margin-top:14px;padding-top:14px;
+           border-top:1px solid {RULE};}}
 
-/* ── MOCK：明確標示為未接上的區域 ─────────────────────────── */
-.mockwrap{{border:1px dashed rgba(192,57,43,.45);border-radius:14px;
-         padding:10px 14px 14px;margin-top:20px;background:rgba(192,57,43,.035);}}
-.mockbar{{background:rgba(192,57,43,.10);border:1px solid rgba(192,57,43,.38);
-        color:{BREAK_C};font-size:12.5px;font-weight:700;letter-spacing:.04em;
-        padding:7px 15px;border-radius:8px;display:inline-block;margin:8px 0 6px;
-        font-family:{MONO};}}
+/* ══ MOCK ═════════════════════════════════════════════════════ */
+.mockwrap{{border:1px dashed rgba(176,58,42,.45);padding:14px 18px 18px;margin-top:26px;
+         background:rgba(176,58,42,.028);}}
+.mockbar{{font-family:{MONO};font-size:11.5px;font-weight:700;letter-spacing:.1em;
+        color:{BREAK_C};border-bottom:2px solid {BREAK_C};padding-bottom:4px;
+        display:inline-block;margin-bottom:12px;}}
 
-/* ── 表格與程式碼 ────────────────────────────────────────── */
-table{{border-collapse:collapse;font-size:13px;margin-top:12px;width:100%;
+/* ══ 表格 ═════════════════════════════════════════════════════ */
+table{{border-collapse:collapse;font-size:13px;margin-top:16px;width:100%;
      font-variant-numeric:tabular-nums;}}
-th,td{{border-bottom:1px solid {HAIR2};padding:9px 14px 9px 0;text-align:left;
+th,td{{border-bottom:1px solid {RULE};padding:11px 18px 11px 0;text-align:left;
      vertical-align:top;}}
-th{{color:{MUTED};font-weight:600;font-family:{MONO};font-size:11.5px;
-   letter-spacing:.06em;text-transform:uppercase;}}
-code{{font-family:{MONO};font-size:12.5px;background:rgba(20,54,84,.07);
-    padding:2px 6px;border-radius:5px;color:{INK2};}}
-.note{{font-size:13.5px;color:{INK2};margin-top:14px;max-width:78ch;}}
+th{{font-family:{MONO};color:{MUTED};font-weight:600;font-size:10.5px;
+   letter-spacing:.14em;text-transform:uppercase;border-bottom:1.5px solid {INK};}}
+tbody tr:hover{{background:{PAPER2};}}
+code{{font-family:{MONO};font-size:12px;background:{PAPER2};padding:2px 6px;
+    color:{INK2};}}
+.note{{font-size:13.5px;color:{INK2};margin-top:16px;max-width:80ch;}}
 .note b{{color:{INK};}}
-.foot{{font-size:12.5px;color:{MUTED};margin-top:56px;padding-top:20px;
-     border-top:1px solid {HAIR};font-family:{MONO};line-height:1.9;}}
 
-/* ── 進場：一次性、克制，且尊重減少動態偏好 ──────────────── */
-@keyframes rise{{from{{opacity:0;transform:translateY(14px);}}
-                to{{opacity:1;transform:none;}}}}
-.hero,.card,.kpi,.mockwrap{{animation:rise .6s cubic-bezier(.22,.7,.3,1) both;}}
-.card{{animation-delay:.06s;}}
-.kpi:nth-child(1){{animation-delay:.04s;}} .kpi:nth-child(2){{animation-delay:.09s;}}
-.kpi:nth-child(3){{animation-delay:.14s;}} .kpi:nth-child(4){{animation-delay:.19s;}}
+/* ══ 頁尾 ═════════════════════════════════════════════════════ */
+.foot{{background:{INK};color:#9db3c4;margin-top:0;padding:40px 0;
+     font-family:{MONO};font-size:12px;line-height:1.95;}}
+.foot code{{background:rgba(255,255,255,.10);color:#cfe0ee;}}
+
+/* ══ 捲動進度：長頁面的位置感 ═══════════════════════════════════ */
+#prog{{position:fixed;top:0;left:0;height:2px;width:0;z-index:99;
+     background:{ACCENT};}}
+
+/* ══ 進場：一次、克制、尊重減少動態偏好 ═════════════════════════ */
+.reveal{{opacity:0;transform:translateY(18px);}}
+.reveal.in{{opacity:1;transform:none;
+          transition:opacity .8s cubic-bezier(.2,.7,.2,1),
+                     transform .8s cubic-bezier(.2,.7,.2,1);}}
+.signal .seg{{transform:scaleX(0);transform-origin:left;}}
+.in .signal .seg{{transform:scaleX(1);
+                transition:transform .5s cubic-bezier(.2,.8,.2,1);}}
+.in .signal .seg:nth-child(2){{transition-delay:.07s;}}
+.in .signal .seg:nth-child(3){{transition-delay:.14s;}}
+.in .signal .seg:nth-child(4){{transition-delay:.21s;}}
 @media (prefers-reduced-motion: reduce){{
-  *{{animation:none !important;transition:none !important;}}
+  html{{scroll-behavior:auto;}}
+  .reveal,.reveal.in{{opacity:1;transform:none;transition:none;}}
+  .signal .seg{{transform:none;transition:none;}}
+  #prog{{display:none;}}
 }}
-a:focus-visible,summary:focus-visible{{outline:2px solid {TELCO_C};outline-offset:3px;}}
+a{{color:{ACCENT_D};}}
+a:focus-visible,summary:focus-visible{{outline:2px solid {ACCENT};outline-offset:3px;}}
 
-/* 本頁預設給桌機看。這一段只保證瀏覽器視窗拉窄時版面不破，
-   不是行動裝置優化——圖表本身在自己的容器裡捲動。 */
-@media (max-width: 900px) {{
-  .wrap {{ padding: 34px 16px 64px; }}
-  .kpis {{ grid-template-columns: 1fr 1fr; }}
+/* 本頁預設給桌機。此段只保證視窗拉窄時版面不破。 */
+@media (max-width:900px){{
+  .stats,.kpis{{grid-template-columns:1fr 1fr;}}
+  .stat,.kpi{{padding-right:18px;}}
+  .masthead{{padding-top:52px;}}
+  .masthead .meta{{padding-bottom:150px;}}
+  .blk{{padding:46px 0;}}
 }}
 """
 
@@ -461,126 +482,162 @@ def build(rows) -> str:
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>中華電信固網 2026 公開目標追蹤板</title>
 <style>{CSS}</style>
-<div class="wrap">
+<div id="prog"></div>
 
-<span class="eyebrow">中華電信固網 2026 公開目標追蹤板</span>
-<h1>台灣固網市場，電信陣營的份額 {years} 年掉了 {abs(delta):.0f} 個百分點</h1>
-<p class="lede">NCC／data.gov.tw 公開統計　·　{first.ym} — {last.ym}　·　{len(rows)} 個月</p>
-
-<div class="hero">
-  <div class="readout">
-    <span class="from">{a.telco_share:.1f}%</span>
-    <span class="arrow">→</span>
-    <span class="to">{z.telco_share:.1f}%</span>
-    <span class="delta">{delta:+.2f} pp ／ {years} 年</span>
+<header class="masthead">
+  {hero_svg(rows, TELCO_C, CABLE_C)}
+  <div class="wrap">
+    <span class="eyebrow">中華電信固網 2026 公開目標追蹤板</span>
+    <h1>電信陣營的固網份額，<em>{years} 年掉了 {abs(delta):.0f} 個百分點</em></h1>
+    <div class="readout">
+      <span class="from">{a.telco_share:.1f}%</span>
+      <span class="arrow">→</span>
+      <span class="to">{z.telco_share:.1f}%</span>
+      <span class="delta">{delta:+.2f} pp</span>
+    </div>
+    <p class="standfirst">
+      政府公開統計、可驗證，也是中華電信在 2026 年打這場降價保衛戰的原因。
+      <b>這是技術陣營層級的代理指標，不是中華電信自身市占</b>——公開統計沒有業者別。
+    </p>
+    <p class="meta">NCC／data.gov.tw　·　{first.ym} — {last.ym}　·　{len(rows)} 個月</p>
   </div>
-  <div class="herotext">
-    政府公開統計、可驗證，也是<b>中華電信在 2026 年打這場降價保衛戰的原因</b>。<br>
-    這個數字是<b>技術陣營層級的代理指標</b>，不是中華電信自己的市占——公開統計無業者別。
+</header>
+
+<main class="wrap">
+
+<section class="sec reveal">
+  <div class="card">{fig_main}</div>
+  <div class="limits">
+    <b>這張圖的三個限制（不放附錄，就寫在圖旁）</b>
+    <ol>
+      <li><b>FTTX ≠ 中華電信</b>——台灣大、遠傳的光纖也計入本陣營，中華電信的貢獻無法分離。</li>
+      <li><b>帳號數 ≠ 用戶數</b>——一戶可能有多個帳號，一個帳號也可能對應多人。</li>
+      <li><b>不做因果宣稱</b>——圖上的事件時點只是時點標記，本看板不估計價格戰的處理效果。</li>
+    </ol>
+    <div class="breaknote">
+      <b>⚠ 兩處資料斷點（紅色虛線）</b>——2009-04 與 2020-01 各出現一次單月劇變，次月即回到原趨勢。
+      2020-01 落在兩份來源的重疊期內，兩份報一模一樣的數字，所以是上游資料本身如此，不是接合造成。
+      該月使電信陣營占比單月下降 <b>{abs(brk_pp):.2f} 個百分點，佔全期 {abs(delta):.2f} pp 的 {brk_share:.1f}%</b>。
+      成因未能證實，查證過程見文末方法說明。
+    </div>
   </div>
-</div>
+</section>
 
-<div class="card">{fig_main}</div>
+<section class="sec reveal">
+  <span class="eyebrow">可追蹤性診斷</span>
+  <h2>四個公開目標，用公開資料一個都追不到</h2>
+  <p class="sectionnote"><b>個人家庭分公司總經理</b>胡學海 2026-03-18 公開宣布（來源：經濟日報／MoneyDJ）。
+  每張卡的訊號格顯示這個目標能追到多少：亮兩格代表只追得到陣營層級的代理，全暗代表公開資料沒有。</p>
+  {kpi_cards()}
+</section>
 
-<div class="limits">
-  <b>這張圖的三個限制（不放附錄，就寫在圖旁）</b>
-  <ol>
-    <li><b>FTTX ≠ 中華電信</b>——台灣大、遠傳的光纖也計入本陣營，中華電信的貢獻無法分離。</li>
-    <li><b>帳號數 ≠ 用戶數</b>——一戶可能有多個帳號，一個帳號也可能對應多人。</li>
-    <li><b>不做因果宣稱</b>——圖上的事件時點<b>只是時點標記</b>，本看板不估計價格戰的處理效果。
-        四種識別策略被否決的理由見文末方法說明。</li>
-  </ol>
-  <div style="margin-top:10px;padding-top:9px;border-top:1px solid {GRID};">
-    <b style="color:{BREAK_C};">⚠ 兩處資料斷點（紅色虛線）</b>——2009-04 與 2020-01 各出現一次單月劇變，
-    次月即回到原趨勢。<b>2020-01 落在兩份來源的重疊期內，兩份報一模一樣的數字</b>，
-    所以是上游資料本身如此，不是接合造成的。
-    該月使電信陣營占比單月下降 <b>{abs(brk_pp):.2f} 個百分點，佔全期 {abs(delta):.2f} pp 的 {brk_share:.1f}%</b>。
-    成因<b>未能證實</b>——查證過程見方法說明。
+<section class="sec reveal">
+  <span class="eyebrow">需要哪些內部欄位</span>
+  <h2>如果有內部資料，這個板會長什麼樣</h2>
+  <div class="mockwrap">
+    <div class="mockbar">⚠ MOCK — 以下全部是假資料，僅示範版面與所需欄位</div>
+    <div class="note" style="margin-top:2px;">
+      目標 3 與目標 4 需要的內部欄位：<code>方案別訂閱數（speed_tier × month）</code>、
+      <code>全屋 Wi-Fi 裝機數 ÷ 寬頻用戶數（month）</code>。
+      管線接上內部資料就能跑完整版。
+    </div>
+    {fig_mock}
   </div>
-</div>
+</section>
 
-<span class="eyebrow">可追蹤性診斷</span>
-<h2>四個公開目標，用公開資料一個都追不到</h2>
-<p class="sectionnote"><b>個人家庭分公司總經理</b>胡學海 2026-03-18 公開宣布（來源：經濟日報／MoneyDJ）。
-下方每張卡的訊號格顯示這個目標能追到多少——亮兩格是只追得到陣營層級的代理，全暗是公開資料完全沒有。</p>
+<section class="sec reveal">
+  <span class="eyebrow">方法</span>
+  <h2>資料怎麼來、判準怎麼定、為什麼不做因果推論</h2>
 
-{kpi_cards()}
+  <h3>資料來源</h3>
+  <table>
+    <tr><th>來源</th><th>粒度</th><th>期間</th><th>狀態</th></tr>
+    <tr><td><code>data.gov.tw / 7164</code> 寬頻上網帳號數</td><td>技術別 × 月</td>
+        <td>2019-01 ~ {last.ym}</td><td>仍更新</td></tr>
+    <tr><td><code>data.gov.tw / 27953</code> 有線寬頻用戶數</td><td>技術別 × 月</td>
+        <td>2007-01 ~ 2020-08</td><td>已停更</td></tr>
+  </table>
+  <p class="note"><b>陣營歸類</b>（看資料前寫死，存於 <code>logs/decisions.log</code>）：
+  電信＝ADSL＋FTTX；Cable＝Cable Modem；Leased_Line 與 PWLAN 排除。</p>
 
-<span class="eyebrow">需要哪些內部欄位</span>
-<h2>如果我有內部資料，這個板會長什麼樣</h2>
-<div class="mockwrap">
-  <div class="mockbar">⚠ MOCK — 以下全部是假資料，僅示範版面與所需欄位，不代表任何真實數值</div>
-  <div style="font-size:13px;color:{INK2};margin:2px 0 6px;">
-    目標 3 與目標 4 需要的內部欄位：<code>方案別訂閱數（speed_tier × month）</code>、
-    <code>全屋 Wi-Fi 裝機數 ÷ 寬頻用戶數（month）</code>。
-    這兩張圖示範「拿到那兩張表之後，追蹤板長什麼樣」——<b>管線接上內部資料就能跑完整版</b>。
+  <h3>兩來源接合校驗</h3>
+  <p class="note">
+  兩份資料重疊 20 個月（2019-01 ~ 2020-08）。逐月逐欄比對 ADSL／FTTX／Cable Modem
+  共 60 筆，全部完全相等，差異中位數與最大值皆 0.0000%，低於預先登記的 5% 放棄門檻。<br>
+  20 期完全一致，比起兩個獨立來源互相驗證，更合理的解釋是兩份出自同一份上游 NCC 報表。
+  因此本報告一律表述為<b>同源確認，可安全接合</b>，不寫成交叉驗證。<br>
+  接合規則：以 7164 為主，2019-01 之前用 27953 補；重疊的 20 期一律採 7164。
+  </p>
+
+  {WHY_NO_CAUSAL}
+
+  <h3>資料斷點的查證過程</h3>
+  <p class="note">
+  2009-04（FTTX 單月 −187,856）與 2020-01（ADSL 單月 −207,430、同月 FTTX +107,873）
+  各出現一次單月劇變，次月即回歸原趨勢。為確認成因查了三個來源：
+  <code>data.gov.tw</code> 兩個資料集的 API 中繼資料（無欄位說明、無統計口徑）、
+  NCC 官網開放資料項目頁（HTTP 403）、公開搜尋（無口徑調整說明）。
+  三者皆無所獲，因此本看板只陳述觀察到的事實，不宣稱成因。
+  旁證是千分位逗號在整份 7164 中只出現在 2020-01 與 2020-02 兩列，格式變動與數值劇變同時發生；
+  這仍然只是旁證。
+  </p>
+
+  <h3>限制</h3>
+  <div class="limits">
+    <ol>
+      <li><b>技術別 ≠ 業者別</b>——FTTX 含台灣大、遠傳，中華電信的貢獻無法分離。</li>
+      <li><b>帳號數 ≠ 用戶數</b>——一戶多帳號、一帳號多人的情況無法辨識。</li>
+      <li><b>不做因果宣稱</b>——事件時點僅供對照，不估計處理效果。</li>
+      <li><b>兩來源接合的殘餘不確定性</b>——0.0000% 代表同源而非互證，
+          兩份共同的系統性偏誤無法用彼此檢出。</li>
+      <li><b>事件時點僅為視覺標記</b>——2022-05 MSO 價格戰（工商時報 2022-05-23）與
+          2026-03-18 中華電信降價（經濟日報／MoneyDJ）。</li>
+      <li><b>兩處資料斷點成因未證實</b>——若 2020-01 確為統計口徑變更，
+          則 {years} 年降幅中約 {brk_share:.0f}% 屬定義效果而非市場變化，
+          其餘約 {residual:+.1f} 個百分點仍為實在的趨勢。</li>
+    </ol>
   </div>
-  {fig_mock}
-</div>
+</section>
 
-<span class="eyebrow">方法</span>
-<h2>資料怎麼來、判準怎麼定、為什麼不做因果推論</h2>
+</main>
 
-<h3>資料來源</h3>
-<table>
-  <tr><th>來源</th><th>粒度</th><th>期間</th><th>狀態</th></tr>
-  <tr><td><code>data.gov.tw / 7164</code> 寬頻上網帳號數</td><td>技術別 × 月</td>
-      <td>2019-01 ~ 2026-04</td><td>仍更新</td></tr>
-  <tr><td><code>data.gov.tw / 27953</code> 有線寬頻用戶數</td><td>技術別 × 月</td>
-      <td>2007-01 ~ 2020-08</td><td>已停更</td></tr>
-</table>
-<p class="note"><b>陣營歸類（看資料前寫死，存於 <code>logs/decisions.log</code>）</b>：
-電信＝ADSL＋FTTX；Cable＝Cable Modem；Leased_Line 與 PWLAN 排除（非家戶固網寬頻）。</p>
-
-<h3>兩來源接合校驗</h3>
-<p class="note">
-兩份資料重疊 <b>20 個月</b>（2019-01 ~ 2020-08）。逐月逐欄比對 ADSL／FTTX／Cable Modem
-共 <b>60 筆，全部完全相等</b>，差異中位數與最大值皆 <b>0.0000%</b>，
-低於預先登記的放棄門檻（中位數 &gt; 5%），<b>接合通過</b>。<br>
-<b>0.0000% 的正確詮釋</b>：20 期完全一致，<b>更可能代表兩個資料集出自同一個上游（NCC 報表）</b>，
-而非兩個獨立來源互相驗證。因此本報告一律表述為
-<b>「同源確認，可安全接合」</b>，<b>不寫成「交叉驗證」或「兩來源互證」</b>。<br>
-接合規則：以 7164 為主，2019-01 之前用 27953 補；<b>重疊的 20 期一律採 7164，不混用</b>。
-</p>
-
-{WHY_NO_CAUSAL}
-
-<h3>資料斷點的查證過程</h3>
-<p class="note">
-2009-04（FTTX 單月 −187,856）與 2020-01（ADSL 單月 −207,430、同月 FTTX +107,873）
-各出現一次單月劇變，次月即回歸原趨勢。為確認成因，查了三個來源：
-<b>(1)</b> <code>data.gov.tw</code> 兩個資料集的 API 中繼資料——無欄位說明、無統計口徑、無備註；
-<b>(2)</b> NCC 官網開放資料項目頁——<b>HTTP 403</b>；
-<b>(3)</b> 公開搜尋——無 2020-01 口徑調整的說明文件。<br>
-<b>三者皆無所獲，因此本看板只陳述觀察到的事實，不宣稱成因。</b>
-可佐證的旁證是：千分位逗號在整份 7164 中<b>只出現在 2020-01 與 2020-02 兩列</b>，
-格式變動與數值劇變同時發生。<b>這仍然只是旁證，不是結論。</b>
-</p>
-
-<h3>限制</h3>
-<div class="limits">
-  <ol>
-    <li><b>技術別 ≠ 業者別</b>——FTTX 含台灣大、遠傳，中華電信的貢獻無法分離。</li>
-    <li><b>帳號數 ≠ 用戶數</b>——一戶多帳號、一帳號多人的情況無法辨識。</li>
-    <li><b>不做因果宣稱</b>——事件時點僅供對照，不估計處理效果。</li>
-    <li><b>兩來源接合的殘餘不確定性</b>——重疊期 20 期差異 0.0000%，但這代表同源而非互證，
-        兩份共同的系統性偏誤無法用彼此檢出。</li>
-    <li><b>事件時點僅為視覺標記</b>——2022-05 MSO 價格戰（工商時報 2022-05-23）與
-        2026-03-18 中華電信降價（經濟日報／MoneyDJ），<b>僅在圖上標示，不估計任何效果</b>。</li>
-    <li><b>兩處資料斷點成因未證實</b>——2009-04 與 2020-01。若 2020-01 確為統計口徑變更，
-        則 {years} 年降幅中約 <b>{brk_share:.0f}%</b> 屬定義效果而非市場變化，
-        其餘約 {residual:+.1f} 個百分點仍為實在的趨勢。</li>
-  </ol>
-</div>
-
-<p class="foot">
+<footer class="foot"><div class="wrap">
 本看板由 <code>src/build_dashboard.py</code> 產生，指標於 PostgreSQL 內以視窗函數計算。
 判準在看資料前寫死並存於 <code>logs/decisions.log</code>（append-only）；
 設計推翻歷程見 <code>docs/decision-trail.md</code>。<br>
 外部求職者以公開資料製作，非中華電信內部文件，不代表該公司立場。
-</p>
+</div></footer>
 
-</div>"""
+<script>
+(() => {{
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // 捲動進度條：長頁面的位置感
+  const prog = document.getElementById('prog');
+  if (prog && !reduced) {{
+    const onScroll = () => {{
+      const h = document.documentElement.scrollHeight - innerHeight;
+      prog.style.width = (h > 0 ? (scrollY / h) * 100 : 0) + '%';
+    }};
+    addEventListener('scroll', onScroll, {{passive: true}});
+    onScroll();
+  }}
+
+  if (reduced) {{
+    document.querySelectorAll('.reveal').forEach(el => el.classList.add('in'));
+    return;
+  }}
+
+  // 區塊進場
+  const io = new IntersectionObserver((entries) => {{
+    entries.forEach(e => {{ if (e.isIntersecting) {{
+      e.target.classList.add('in'); io.unobserve(e.target);
+    }} }});
+  }}, {{threshold: 0.08, rootMargin: '0px 0px -8% 0px'}});
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+}})();
+</script>"""
 
 
 def write_plotlyjs() -> Path:

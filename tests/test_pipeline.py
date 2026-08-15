@@ -4,8 +4,8 @@
 CI 才掛得上。落庫與指標的正確性由 `load_postgres.py --verify`（逐列 md5）
 與 `compute_metrics.py` 的自檢負責，那兩層需要資料庫。
 
-Ground Truth 來源：`logs/decisions.log`（開工前存檔），
-由規格制定者於 2026-08-02 實測。**測試失敗代表解析錯了，不是改測試的理由。**
+Ground Truth 於開工前實測並存檔（2026-08-02），本檔把它編碼成回歸測試。
+**測試失敗代表解析錯了，不是改測試的理由。**
 """
 
 from __future__ import annotations
@@ -104,7 +104,7 @@ def test_no_missing_or_duplicate_months(loader):
         assert cur == ((y + 1, 1) if m == 12 else (y, m + 1))
 
 
-# ── 規格第四節：陣營歸類寫死，不得更改 ─────────────────────────────────
+# ── 陣營歸類預先登記、寫死，不得更改 ───────────────────────────────────
 def test_camp_mapping_is_frozen():
     assert CAMP == {
         "ADSL": "TELCO",
@@ -141,7 +141,7 @@ def test_overlap_difference_is_exactly_zero():
 
 
 def test_splice_takes_7164_over_the_overlap():
-    """規格第四節：重疊期一律採 7164，**不混用**。"""
+    """預先登記：重疊期一律採 7164，**不混用**。"""
     out = spliced()
     for r in out:
         if r.period >= SPLICE_CUTOVER:

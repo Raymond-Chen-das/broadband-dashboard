@@ -1,11 +1,11 @@
 """階段 2：接合校驗。
 
-依規格第四節（已於看資料前存進 `logs/decisions.log`）：
+判準於看資料前寫下並標上時間戳：
     重疊期兩序列的月度差異中位數 > 5% → **放棄接合**，只呈現 7164（2019-01 起）。
 **閾值 5% 已寫死，不得因看到結果而調整。**
 
 只比對 ADSL／FTTX／Cable Modem 三欄。**絕不比對兩份的總計欄**——
-27953 的總計含 PWLAN，7164 的小計固網不含（prompt 第二節陷阱 2）。
+27953 的總計含 PWLAN，7164 的小計固網不含。
 
 用法：
     .\\.venv\\Scripts\\python.exe src\\splice_check.py
@@ -27,7 +27,7 @@ from sources import (
     spliced,
 )
 
-THRESHOLD_PCT = 5.0  # 規格第四節，寫死
+THRESHOLD_PCT = 5.0  # 預先登記，寫死
 
 
 def index(records) -> dict[tuple[int, int, str], int]:
@@ -36,7 +36,7 @@ def index(records) -> dict[tuple[int, int, str], int]:
 
 def main() -> int:
     print("階段 2：接合校驗")
-    print("依據：docs/10-project-spec.md 第四節、5.2；閾值 5% 已預先登記，不得調整\n")
+    print("閾值 5% 已預先登記，不得因看到結果而調整\n")
 
     a = index(load_7164())      # 主序列
     b = index(load_27953())     # 補早期
@@ -49,7 +49,7 @@ def main() -> int:
           f"{len(periods) * len(COMPARABLE)} 筆\n")
 
     # 差異定義：以 7164（主序列）為分母。此為規格未寫明、實作者自行選定的
-    # 判準，理由：接合規則指定 7164 為主，分母取主序列語義一致。已記入 decision-trail。
+    # 判準，理由：接合規則指定 7164 為主，分母取主序列語義一致。
     rows: list[tuple[str, str, int, int, int, float]] = []
     for period in periods:
         for tech in COMPARABLE:
@@ -92,9 +92,9 @@ def main() -> int:
 
     print(f"\n  ✅ {median_pct:.4f}% ≤ {THRESHOLD_PCT}% → **接合通過**。")
 
-    # 規格 5.2（2026-08-06 外部審查）：0.0000% 的詮釋已預先寫死。
+    # 0.0000% 的詮釋已預先寫死（2026-08-06 外部審查後確立）。
     if max_pct == 0.0:
-        print("\n  ⚠️ 措辭規則（規格 5.2，預先寫死，不得改寫）：")
+        print("\n  ⚠️ 措辭規則（預先寫死，不得改寫）：")
         print("     20 期三欄完全一致，**更可能代表兩個資料集出自同一個上游（NCC 報表）**，")
         print("     而非兩個獨立來源互相驗證。")
         print("     → 一律表述為「**同源確認，可安全接合**」。")

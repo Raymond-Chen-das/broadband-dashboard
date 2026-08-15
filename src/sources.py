@@ -2,8 +2,7 @@
 
 輸出統一長格式：`Record(year, month, tech_code, accounts, source)`。
 
-**技術別與陣營歸類依規格第四節寫死，本模組不得自行更改**
-（正本：`docs/10-project-spec.md` 第四節；副本已存進 `logs/decisions.log`）。
+**技術別與陣營歸類在看資料前即固定並標上時間戳，本模組不得自行更改。**
 """
 
 from __future__ import annotations
@@ -21,7 +20,7 @@ F_27953 = RAW / "ncc_27953_有線寬頻用戶數.csv"
 SRC_7164 = "ncc_7164"
 SRC_27953 = "ncc_27953"
 
-# --- 陣營歸類（規格第四節，寫死）-------------------------------------------
+# --- 陣營歸類（預先登記，寫死）---------------------------------------------
 # TELCO = ADSL, FTTX ／ CABLE = Cable Modem ／ EXCLUDED = Leased_Line, PWLAN
 CAMP: dict[str, str] = {
     "ADSL": "TELCO",
@@ -40,11 +39,11 @@ TECH_NAME: dict[str, str] = {
 }
 
 # 接合校驗只比對這三欄。**絕不可比對兩份的總計欄**——27953 的總計含 PWLAN，
-# 7164 的小計固網不含（prompt 第二節陷阱 2）。
+# 7164 的小計固網不含。
 COMPARABLE = ("ADSL", "FTTX", "CABLE_MODEM")
 
 # 來源欄位 → tech_code。未列入者一律不載入：
-#   7164 的「行動寬頻」屬無線寬頻，依規格第四節排除（非家戶固網寬頻），
+#   7164 的「行動寬頻」屬無線寬頻，預先登記時即排除（非家戶固網寬頻），
 #   且 27953 無對應欄位，載入會製造兩來源不對稱的技術別清單。
 #   各種「小計 / 合計 / Data+Voice / Data only」為衍生欄，非分項，不入事實表。
 MAP_7164 = {
@@ -63,7 +62,7 @@ MAP_27953 = {
     "無線寬頻帳號-PWLAN": "PWLAN",
 }
 
-# 接合切點（規格第四節：以 7164 為主，2019-01 之前用 27953 補）
+# 接合切點（預先登記：以 7164 為主，2019-01 之前用 27953 補）
 SPLICE_CUTOVER = (2019, 1)
 
 
@@ -125,7 +124,7 @@ def overlap_periods() -> list[tuple[int, int]]:
 def spliced() -> list[Record]:
     """接合後的序列：2019-01 起用 7164，之前用 27953。
 
-    **重疊期不混用**——重疊的 20 期一律採 7164（規格第四節）。
+    **重疊期不混用**——重疊的 20 期一律採 7164（預先登記）。
     呼叫端必須先確認階段 2 的校驗已通過。
     """
     early = [r for r in load_27953() if r.period < SPLICE_CUTOVER]

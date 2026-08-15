@@ -7,7 +7,7 @@
 
 用法：
     .\\.venv\\Scripts\\python.exe src\\validate_contracts.py
-退出碼：0 = 全部通過；1 = 任一項不符（依 prompt 階段 1 閘門，不得自行修補資料）。
+退出碼：0 = 全部通過；1 = 任一項不符——後續階段一律不執行，也不修補資料。
 """
 
 from __future__ import annotations
@@ -24,7 +24,7 @@ F_27953 = RAW / "ncc_27953_有線寬頻用戶數.csv"
 
 # ---------------------------------------------------------------------------
 # 契約：以 2026-08-08 的檔案快照釘住。欄位若變動，驗證即失敗——這正是契約的用途。
-# 來源：logs/decisions.log 的 Ground Truth 自檢基準
+# 來源：開工前實測並存檔的 Ground Truth 自檢基準
 # ---------------------------------------------------------------------------
 
 COLS_7164 = [
@@ -87,7 +87,7 @@ SUM_27953 = {
     ],
 }
 
-TOLERANCE = 0.001  # 0.1%，依規格 5.1
+TOLERANCE = 0.001  # 0.1%，預先登記
 
 results: list[tuple[str, bool, str]] = []
 
@@ -233,7 +233,7 @@ def period_27953(row: dict[str, str]) -> tuple[int, int]:
 
 def main() -> int:
     print("階段 1：資料契約驗證（只驗證、不轉換、不寫入）")
-    print("依據：docs/10-project-spec.md 5.1、logs/decisions.log 的預先登記表")
+    print("依據：預先登記的契約表——欄位、列數、型別、算術、連續性、期間")
 
     check_file("7164", F_7164, COLS_7164, SUM_7164, period_7164)
     check_file("27953", F_27953, COLS_27953, SUM_27953, period_27953)
@@ -245,7 +245,7 @@ def main() -> int:
     failed = [r for r in results if not r[1]]
     print(f"\n  合計 {len(results)} 項，通過 {len(results) - len(failed)}，失敗 {len(failed)}")
     if failed:
-        print("\n  ❌ 契約未通過 → 依閘門規則停止，不得進入分析層，不得自行修補資料。")
+        print("\n  ❌ 契約未通過 → 停止，不進入分析層，也不修補資料。")
         return 1
     print("\n  ✅ 契約全數通過 → 可進入階段 2（接合校驗）。")
     return 0

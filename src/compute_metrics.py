@@ -1,4 +1,4 @@
-"""階段 4：指標計算（依規格第四節預先登記，不得增補）。
+"""指標計算：清單於檢視資料前預先登記，不得增補。
 
 **只算這些**：
   主要——兩陣營月度帳號數、月度淨增量（月差分）
@@ -22,7 +22,7 @@ from dataclasses import dataclass
 
 from db import connect
 
-# Ground Truth（logs/decisions.log 第 1.2 節）
+# Ground Truth（看資料前登記的回歸錨點；測試對這兩期精確斷言）
 GT = {
     "2019-01": dict(telco=4_296_061, cable=1_403_819, share=75.37),
     "2026-04": dict(telco=4_872_796, cable=2_469_678, share=66.36),
@@ -36,7 +36,7 @@ WITH camp_monthly AS (
            SUM(f.accounts) FILTER (WHERE d.camp = 'CABLE') AS cable
     FROM fact_subscriptions_monthly f
     JOIN dim_technology d USING (tech_code)
-    WHERE d.camp IN ('TELCO', 'CABLE')          -- EXCLUDED 不進陣營計算（規格第四節）
+    WHERE d.camp IN ('TELCO', 'CABLE')          -- EXCLUDED 不進陣營計算（預先登記）
     GROUP BY f.year_month
 ),
 base AS (
@@ -153,7 +153,7 @@ def main() -> int:
         print(f"  {r.ym:<9}{r.telco_share:>9.2f}%{r.telco_ma12:>14,.1f}"
               f"{r.cable_ma12:>14,.1f}{r.telco_cum_net:>15,}{r.cable_cum_net:>15,}")
 
-    # ── 已知的兩個資料斷點（decisions.log 決定 A：標記，不修改數字）──────
+    # ── 已知的兩個資料斷點（處置看資料前即固定：標記，不修改數字）──────
     print(f"\n{'=' * 78}\n  兩個資料斷點在指標上的樣子（僅標記，不修改任何數值）\n{'=' * 78}")
     print(f"  {'年月':<9}{'電信淨增':>12}{'Cable 淨增':>13}{'電信占比':>10}{'占比月變動':>12}")
     for ym in ("2009-03", "2009-04", "2009-05", "2019-12", "2020-01", "2020-02"):
@@ -164,7 +164,7 @@ def main() -> int:
               f"{r.telco_share - prev.telco_share:>11.4f}pp{mark}")
 
     print("\n  ⚠️ 成因未能證實（已查 data.gov.tw 中繼資料、NCC 官網 403、公開搜尋，"
-          "皆無口徑說明）。\n     依 logs/decisions.log 決定 A：看板標記 ＋ 限制章節寫明查證過程，**不宣稱成因**。")
+          "皆無口徑說明）。\n     處置為看資料前即固定：看板標記 ＋ 限制章節寫明查證過程，**不宣稱成因**。")
     return 0
 
 

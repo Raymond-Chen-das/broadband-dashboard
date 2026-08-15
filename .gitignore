@@ -20,3 +20,6 @@ docs/10-project-spec.md
 
 # 預先登記日誌（以執行者第一人稱寫的施工日誌，僅本機，不公開）
 logs/decisions.log
+
+# 決策軌跡（預設讀者是接手的人或未來的自己，非 repo 訪客；僅本機）
+docs/decision-trail.md

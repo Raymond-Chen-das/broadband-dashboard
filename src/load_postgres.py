@@ -1,11 +1,11 @@
 """階段 3：落庫（星型 schema ＋ 冪等 upsert）。
 
 schema 依 本檔階段 3 的 DDL（原出處為已刪除的一次性 prompt），
-另補 `dim_period`——規格 5.3 明列星型為 `fact_subscriptions_monthly` ／
+另補 `dim_period`——星型為 `fact_subscriptions_monthly` ／
 `dim_technology` ／ `dim_period` 三張表，prompt 的 DDL 漏了第三張。
-**設計以規格為正本**（prompt 第〇節：設計爭議一律回規格）。
+**schema 於檢視資料前定案，本檔不自行更改。**
 
-陣營歸類依規格第四節寫死，來自 `sources.CAMP`，本檔不重新定義。
+陣營歸類於檢視資料前寫死，來自 `sources.CAMP`，本檔不重新定義。
 
 用法：
     .\\.venv\\Scripts\\python.exe src\\load_postgres.py          # 建表 ＋ 載入

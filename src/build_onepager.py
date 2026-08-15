@@ -75,7 +75,7 @@ EVIDENCE = [
     ("資料分析與統計方法",
      "判準於檢視資料前固定並存檔（append-only）、兩來源接合校驗 60 筆零差異、"
      "四種因果識別策略逐一否決並寫明理由、限制章節六條",
-     "logs/decisions.log<br>docs/30-splice-validation-report.md"),
+     "tests/test_pipeline.py<br>docs/30-splice-validation-report.md"),
     ("資料處理與品質控管",
      "16 項資料契約驗證（欄位、型別、算術、連續性、期間），"
      "任一項未通過即中止後續所有階段；22 項自動化測試將 Ground Truth 編碼為回歸測試",
@@ -316,7 +316,7 @@ a:hover{{color:{ACCENT_D};border-bottom-color:{ACCENT_D};}}
 </div>
 
 <p class="foot">
-判準於檢視資料前固定並存檔（logs/decisions.log，append-only）；
+判準於檢視資料前固定並標上時間戳（紀錄 append-only）；
 設計推翻歷程見 docs/decision-trail.md。<br>
 本專案不做因果宣稱，四種識別策略被具體事實否決的理由寫在看板的方法說明頁。
 </p>

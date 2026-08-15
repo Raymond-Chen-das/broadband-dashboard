@@ -42,14 +42,16 @@
 1. **契約驗證先於一切** — 欄位、列數、去除千分位逗號後是否為非負整數、小計算術、
    月份連續性、期間範圍。共 16 項，任一項未通過即中止後續所有階段。
 2. **接合校驗** — 兩份來源重疊 20 個月。三個可比欄位逐月比對。
-   5% 的放棄門檻**在看資料之前**就寫進 `logs/decisions.log`（append-only）。
+   5% 的放棄門檻**在看資料之前**就寫下並標上時間戳——紀錄 append-only，留存於本機。
 3. **落庫** — PostgreSQL 17 星型 schema（`fact_subscriptions_monthly`、
    `dim_technology`、`dim_period`），冪等 upsert，以逐列 MD5 驗證。
 4. **指標** — 在 PostgreSQL 內以視窗函數計算，不撈回 Python 算。
 5. **看板** — 單頁 HTML（Plotly），可離線開啟。
 
-**預先登記。** 所有閾值、陣營歸類、outcome 指標與接合規則，都在檢視資料之前寫下並標上時間戳。
-該檔 append-only。這是防止結果出來後才悄悄調整判準的唯一機制。
+**預先登記。** 所有閾值、陣營歸類、outcome 指標與接合規則，都在檢視資料之前寫下並標上時間戳——
+紀錄 append-only，留存於本機。這是防止結果出來後才悄悄調整判準的唯一機制。
+它的效果在 repo 裡看得到：`tests/test_pipeline.py` 把預先登記的 Ground Truth
+編碼成回歸測試，數字一漂就紅。
 
 **不做因果宣稱。** 四種識別策略各自被一個具體事實擋掉，理由記於
 `docs/decision-trail.md` 並複述於看板的方法說明頁。圖上的事件時點只是視覺標記，
@@ -136,7 +138,7 @@ py -3.13 -m venv .venv
 ```
 src/       管線：sources → 契約 → 接合 → 落庫 → 指標 → 看板
 docs/      規格、決策軌跡（append-only）、資料庫實驗、接合校驗報告
-logs/      預先登記（append-only）、原始量測值、月更新執行紀錄
+logs/      原始量測值、月更新執行紀錄（append-only）
 data/raw/  兩份來源 CSV，未經修改
 dashboard/ 產生的看板（index.html + plotly.min.js）與摘要頁
 tests/     契約與 Ground Truth 測試

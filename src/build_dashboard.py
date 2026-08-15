@@ -665,8 +665,8 @@ def build(rows) -> str:
         <tr><td><code>27953</code> 有線寬頻用戶數</td><td>技術別 × 月</td>
             <td class="ym">2007-01 → 2020-08</td><td>已停更</td></tr>
       </table>
-      <p class="note"><b>陣營歸類</b>於檢視資料前即固定並存入
-      <code>logs/decisions.log</code>：電信陣營為 ADSL 與 FTTX，Cable 陣營為 Cable Modem；
+      <p class="note"><b>陣營歸類</b>於檢視資料前即固定並標上時間戳：
+      電信陣營為 ADSL 與 FTTX，Cable 陣營為 Cable Modem；
       Leased_Line 與 PWLAN 排除。</p>
 
       <h3>兩來源接合校驗</h3>
@@ -698,7 +698,7 @@ def build(rows) -> str:
   <h3 style="margin-top:40px;">限制</h3>
   <div class="panel" style="margin-top:12px;">
     <div class="items">
-      <div class="item"><span class="i">01</span><span class="t"><b>技術別不等於業者別。</b>FTTX 含台灣大與遠傳，中華電信的貢獻無法分離。</span></div>
+      <div class="item"><span class="i">01</span><span class="t"><b>技術別不等於業者別。</b>FTTX 含台灣大與遠傳，中華電信的貢獻無法分離。同理，<b>若有線電視業者佈建的 FTTH 依技術別歸入 FTTX 欄</b>，本分析會系統性低估 Cable 陣營的實際份額，亦即電信陣營的份額變化可能比觀測到的更大。NCC 的填報規則未經查證，也無法用本資料驗證；<b>此一偏誤的方向對本文結論為保守。</b></span></div>
       <div class="item"><span class="i">02</span><span class="t"><b>帳號數不等於用戶數。</b>一戶多帳號、一帳號多人的情況無法辨識。</span></div>
       <div class="item"><span class="i">03</span><span class="t"><b>不做因果宣稱。</b>事件時點僅供對照，不估計處理效果。</span></div>
       <div class="item"><span class="i">04</span><span class="t"><b>兩來源接合的殘餘不確定性。</b>0.0000% 代表同源而非互證，兩份共同的系統性偏誤無法用彼此檢出。</span></div>
@@ -712,7 +712,7 @@ def build(rows) -> str:
 
 <footer class="foot"><div class="wrap">
 本看板由 <code>src/build_dashboard.py</code> 產生，指標在 PostgreSQL 內以視窗函數計算。
-判準在檢視資料前固定並存於 <code>logs/decisions.log</code>（append-only）；
+判準在檢視資料前固定並標上時間戳（紀錄 append-only）；
 設計推翻歷程見 <code>docs/decision-trail.md</code>。<br>
 外部求職者以公開資料製作，非中華電信內部文件，不代表該公司立場。
 </div></footer>

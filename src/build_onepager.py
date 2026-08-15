@@ -69,7 +69,8 @@ EVIDENCE = [
     ("熟悉資料庫操作",
      "PostgreSQL 17 星型 schema、冪等 upsert（逐列 md5 驗證）、"
      "以 SQL 視窗函數計算全部指標、查詢調校"
-     "（Seq Scan 改為 Index Only Scan，buffers 16,604 降到 409）、索引寫入代價實測",
+     "（Seq Scan 改為 Index Only Scan，buffers 16,604 降到 409；合成 200 萬列基準表）、"
+     "索引寫入代價實測",
      "src/load_postgres.py<br>src/compute_metrics.py<br>docs/20-db-experiments.md"),
     ("資料分析與統計方法",
      "判準於檢視資料前固定並存檔（append-only）、兩來源接合校驗 60 筆零差異、"
@@ -111,7 +112,9 @@ NOT_CLAIMED = [
 # 全部維持假設語氣，不得出現「建議」二字（本專案硬性約束第 5 條）。
 IF_INSIDE = [
     "若取得業者別資料，第一步是把陣營層級的降幅拆到業者，"
-    "判斷流失屬區域集中或全面性——這決定應以價格或覆蓋率回應。",
+    # 原寫「判斷流失屬…」。「流失」是資料不支撐的措辭：電信陣營帳號數 2019-01→2026-05
+    # 實際成長約 59 萬（430 萬→489 萬），份額下降來自 Cable 成長更快，不是用戶流失。
+    "判斷份額變化屬區域集中或全面性——這決定應以價格或覆蓋率回應。",
     "若取得方案速率分佈，可直接驗證 300M 以上占比，不必再用代理。",
     "若取得訂單資料，可將寬頻與 MOD、Wi-Fi 全屋的搭售組合對續約率交叉分析。",
 ]
@@ -282,7 +285,7 @@ a:hover{{color:{ACCENT_D};border-bottom-color:{ACCENT_D};}}
   <div class="num"><div class="v">60 / 60</div>
     <div class="l">重疊 20 期比對完全相等（0.0000%）</div></div>
   <div class="num"><div class="v">16,604 → 409</div>
-    <div class="l">查詢調校後 buffers 讀取量</div></div>
+    <div class="l">查詢調校後 buffers 讀取量（合成 200 萬列基準表）</div></div>
   <div class="num"><div class="v">22</div>
     <div class="l">自動化測試，CI 執行，不依賴資料庫</div></div>
 </div>

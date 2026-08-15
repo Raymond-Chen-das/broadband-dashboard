@@ -115,7 +115,8 @@ KPIS = [
     dict(n=2, goal="市占守住 51%", sub="", state="partial",
          badge="僅代理指標",
          miss="分母有（全台固網寬頻帳號數），<b>分子沒有</b>（HiNet 用戶數）。",
-         proxy="最接近的代理：電信陣營占比 66.36%（2026-04），惟其單位為陣營而非業者。"),
+         proxy="最接近的代理：電信陣營占比 66.36%（2026-04），惟其單位為陣營而非業者，"
+               "且分母僅含兩陣營（Leased Line 未計；其量級僅千餘帳號，影響 < 0.02 pp）。"),
     dict(n=3, goal="300M 以上占比破 50%", sub="2022:27% → 2025:46%",
          state="none", badge="追不到",
          miss="公開統計未提供訂閱方案的速率分佈。M-Lab 雖有 ISP 級實測速度，"
@@ -592,7 +593,7 @@ def build(rows) -> str:
       <div class="stat"><div class="num">60 / 60</div>
         <div class="lab">兩來源重疊 20 期比對，差異 0.0000%</div></div>
       <div class="stat"><div class="num">16,604 → 409</div>
-        <div class="lab">查詢調校後的 buffers 讀取量</div></div>
+        <div class="lab">查詢調校後的 buffers 讀取量（合成 200 萬列基準表）</div></div>
       <div class="stat"><div class="num">22</div>
         <div class="lab">自動化測試，CI 執行，不依賴資料庫</div></div>
     </div>

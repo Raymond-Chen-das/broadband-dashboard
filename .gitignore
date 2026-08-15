@@ -13,3 +13,7 @@ pgdata/
 # OS
 Thumbs.db
 desktop.ini
+
+# 內部文件（AI 協作指示與職缺對應設計，僅本機，不公開）
+CLAUDE.md
+docs/10-project-spec.md

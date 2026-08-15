@@ -150,7 +150,7 @@ a:hover{color:#333db3;border-bottom-color:#333db3;}
   <div class="num"><div class="v">60 / 60</div>
     <div class="l">重疊 20 期比對完全相等（0.0000%）</div></div>
   <div class="num"><div class="v">16,604 → 409</div>
-    <div class="l">查詢調校後 buffers 讀取量</div></div>
+    <div class="l">查詢調校後 buffers 讀取量（合成 200 萬列基準表）</div></div>
   <div class="num"><div class="v">22</div>
     <div class="l">自動化測試，CI 執行，不依賴資料庫</div></div>
 </div>
@@ -158,7 +158,7 @@ a:hover{color:#333db3;border-bottom-color:#333db3;}
 <h2>條件對照</h2>
 <table>
   <tr><th>能力項目</th><th>本專案的對應證據</th><th>位置</th></tr>
-  <tr><td class='req'>熟悉資料庫操作</td><td>PostgreSQL 17 星型 schema、冪等 upsert（逐列 md5 驗證）、以 SQL 視窗函數計算全部指標、查詢調校（Seq Scan 改為 Index Only Scan，buffers 16,604 降到 409）、索引寫入代價實測</td><td class='where'>src/load_postgres.py<br>src/compute_metrics.py<br>docs/20-db-experiments.md</td></tr><tr><td class='req'>資料分析與統計方法</td><td>判準於檢視資料前固定並存檔（append-only）、兩來源接合校驗 60 筆零差異、四種因果識別策略逐一否決並寫明理由、限制章節六條</td><td class='where'>logs/decisions.log<br>docs/30-splice-validation-report.md</td></tr><tr><td class='req'>資料處理與品質控管</td><td>16 項資料契約驗證（欄位、型別、算術、連續性、期間），任一項未通過即中止後續所有階段；22 項自動化測試將 Ground Truth 編碼為回歸測試</td><td class='where'>src/validate_contracts.py<br>tests/test_pipeline.py</td></tr><tr><td class='req'>視覺化與溝通</td><td>單頁離線 HTML 看板；調色盤經色覺驗證器檢查；限制敘述置於圖側而非附錄；不可追蹤的指標明確標示，不予省略</td><td class='where'>dashboard/index.html<br>src/build_dashboard.py</td></tr><tr><td class='req'>專案成效追蹤（可持續運行）</td><td>月更新管線：data.gov.tw 兩段式取用、契約驗證、缺月偵測、冪等 upsert、重生看板。已針對真實的新月份完成端到端實跑</td><td class='where'>src/update_monthly.py<br>logs/update-runs.log</td></tr>
+  <tr><td class='req'>熟悉資料庫操作</td><td>PostgreSQL 17 星型 schema、冪等 upsert（逐列 md5 驗證）、以 SQL 視窗函數計算全部指標、查詢調校（Seq Scan 改為 Index Only Scan，buffers 16,604 降到 409；合成 200 萬列基準表）、索引寫入代價實測</td><td class='where'>src/load_postgres.py<br>src/compute_metrics.py<br>docs/20-db-experiments.md</td></tr><tr><td class='req'>資料分析與統計方法</td><td>判準於檢視資料前固定並存檔（append-only）、兩來源接合校驗 60 筆零差異、四種因果識別策略逐一否決並寫明理由、限制章節六條</td><td class='where'>logs/decisions.log<br>docs/30-splice-validation-report.md</td></tr><tr><td class='req'>資料處理與品質控管</td><td>16 項資料契約驗證（欄位、型別、算術、連續性、期間），任一項未通過即中止後續所有階段；22 項自動化測試將 Ground Truth 編碼為回歸測試</td><td class='where'>src/validate_contracts.py<br>tests/test_pipeline.py</td></tr><tr><td class='req'>視覺化與溝通</td><td>單頁離線 HTML 看板；調色盤經色覺驗證器檢查；限制敘述置於圖側而非附錄；不可追蹤的指標明確標示，不予省略</td><td class='where'>dashboard/index.html<br>src/build_dashboard.py</td></tr><tr><td class='req'>專案成效追蹤（可持續運行）</td><td>月更新管線：data.gov.tw 兩段式取用、契約驗證、缺月偵測、冪等 upsert、重生看板。已針對真實的新月份完成端到端實跑</td><td class='where'>src/update_monthly.py<br>logs/update-runs.log</td></tr>
 </table>
 
 <div class="twocol">
@@ -168,7 +168,7 @@ a:hover{color:#333db3;border-bottom-color:#333db3;}
   </div>
   <div>
     <h2>若取得內部資料，第一步會看什麼</h2>
-    <div class="inside"><div class='ii'>若取得業者別資料，第一步是把陣營層級的降幅拆到業者，判斷流失屬區域集中或全面性——這決定應以價格或覆蓋率回應。</div><div class='ii'>若取得方案速率分佈，可直接驗證 300M 以上占比，不必再用代理。</div><div class='ii'>若取得訂單資料，可將寬頻與 MOD、Wi-Fi 全屋的搭售組合對續約率交叉分析。</div></div>
+    <div class="inside"><div class='ii'>若取得業者別資料，第一步是把陣營層級的降幅拆到業者，判斷份額變化屬區域集中或全面性——這決定應以價格或覆蓋率回應。</div><div class='ii'>若取得方案速率分佈，可直接驗證 300M 以上占比，不必再用代理。</div><div class='ii'>若取得訂單資料，可將寬頻與 MOD、Wi-Fi 全屋的搭售組合對續約率交叉分析。</div></div>
   </div>
 </div>
 

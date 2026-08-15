@@ -97,7 +97,23 @@ NOT_CLAIMED = [
      "本專案的月更新管線屬 DataOps 而非 MLOps，故不作此宣稱。"),
     ("刻意不含公文格式文件。",
      "為迎合 單一條款而扭曲作品形態，本身即為負面訊號。"),
-    ("不含任何模型。", "價值在約束與工程，不在演算法。"),
+    # 原本只寫「不含任何模型。價值在約束與工程，不在演算法。」——這一頁若被單獨
+    # 閱讀（它就是設計成可以單獨閱讀的），那句會被讀成「這個人不會建模」，
+    # 而 本專案的定位要的正是模型。補上建模作品的指路，把能力缺口與**本專案的取捨**分開。
+    # 三件作品均可在 ../portfolio.md 找到佐證（專案 9／專案 8／台股情緒 PSO×LLM）。
+    ("本專案不含模型。",
+     "建模作品另見 SECOM 半監督異常偵測、語音情緒辨識跨語料庫比較、台股情緒預測。"
+     "價值在約束與工程，不在演算法。"),
+]
+
+# 「若取得內部資料，第一步會看什麼」。
+# 分寸線：**「建議公司做什麼」＝僭越；「若我在內部會先看什麼」＝問題排序能力。**
+# 全部維持假設語氣，不得出現「建議」二字（本專案硬性約束第 5 條）。
+IF_INSIDE = [
+    "若取得業者別資料，第一步是把陣營層級的降幅拆到業者，"
+    "判斷流失屬區域集中或全面性——這決定應以價格或覆蓋率回應。",
+    "若取得方案速率分佈，可直接驗證 300M 以上占比，不必再用代理。",
+    "若取得訂單資料，可將寬頻與 MOD、Wi-Fi 全屋的搭售組合對續約率交叉分析。",
 ]
 
 
@@ -112,6 +128,7 @@ def build(rows) -> str:
         f"<td class='where'>{where}</td></tr>"
         for req, what, where in EVIDENCE)
     nc = "".join(f"<div class='nc'><b>{h}</b>{t}</div>" for h, t in NOT_CLAIMED)
+    ii = "".join(f"<div class='ii'>{t}</div>" for t in IF_INSIDE)
 
     return f"""<meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -181,6 +198,21 @@ th:last-child,td:last-child{{padding-right:0;}}
        padding:16px 20px;display:flex;flex-direction:column;gap:9px;}}
 .nc{{font-size:12.8px;color:{INK2};}}
 .nc b{{color:{WARN};font-weight:500;}}
+
+/* 「我不宣稱的事」與「若取得內部資料會先看什麼」並排：
+   前者是能力邊界，後者是問題排序。兩者相鄰時，讀者才不會把前者讀成後者的缺席。
+   用系列主色而非警示色——這一欄不是警告，是前瞻。 */
+.twocol{{display:grid;grid-template-columns:1fr 1fr;gap:22px;align-items:start;}}
+.twocol h2{{margin-top:32px;}}
+.inside{{background:{PAPER2};border:1px solid rgba(74,86,201,.18);border-radius:10px;
+       padding:16px 20px;display:flex;flex-direction:column;gap:9px;}}
+.ii{{font-size:12.8px;color:{INK2};padding-left:15px;position:relative;}}
+.ii::before{{content:"";position:absolute;left:0;top:7px;width:5px;height:5px;
+           border-radius:50%;background:{ACCENT};}}
+
+/* hero 與四張卡片之間的橋：不熟固網的讀者看不出那四個目標為什麼值得追。 */
+.bridge{{font-size:13.5px;color:{INK};margin:14px 0 0;padding-left:13px;
+       border-left:2px solid {ACCENT};}}
 code{{font-family:{MONO};font-size:11.5px;background:rgba(19,24,34,.06);
     padding:2px 6px;border-radius:4px;color:{INK2};}}
 
@@ -198,6 +230,7 @@ a:hover{{color:{ACCENT_D};border-bottom-color:{ACCENT_D};}}
   .grid,.nums{{grid-template-columns:1fr 1fr;}}
   .hero{{flex-direction:column;align-items:flex-start;gap:14px;}}
   .heronote{{border-left:0;padding-left:0;}}
+  .twocol{{grid-template-columns:1fr;gap:0;}}
 }}
 </style>
 <div class="page">
@@ -216,11 +249,13 @@ a:hover{{color:{ACCENT_D};border-bottom-color:{ACCENT_D};}}
   <div class="big">{a.telco_share:.1f}% <span class="arrow">→</span>
     <em>{z.telco_share:.1f}%</em></div>
   <div class="heronote">
-    台灣固網寬頻，<b>電信陣營占比 {years} 年下降 {abs(delta):.2f} 個百分點</b>。
+    台灣固網寬頻，<b>電信陣營占比 {years} 年下降約 {abs(delta):.1f} 個百分點</b>。
     資料取自政府公開統計，計算過程可重現驗證。<br>
     這是<b>技術陣營層級的代理指標</b>，不等同於中華電信自身市占，因公開統計未提供業者別。
   </div>
 </div>
+
+<p class="bridge">這約 {abs(delta):.0f} 個百分點，就是中華電信 2026 年 3 月全線降價的背景。</p>
 
 <h2>四個公開目標，用公開資料一個都追不到</h2>
 <div class="grid">
@@ -258,8 +293,16 @@ a:hover{{color:{ACCENT_D};border-bottom-color:{ACCENT_D};}}
   {ev}
 </table>
 
-<h2>我不宣稱的事</h2>
-<div class="honest">{nc}</div>
+<div class="twocol">
+  <div>
+    <h2>我不宣稱的事</h2>
+    <div class="honest">{nc}</div>
+  </div>
+  <div>
+    <h2>若取得內部資料，第一步會看什麼</h2>
+    <div class="inside">{ii}</div>
+  </div>
+</div>
 
 <div class="qrbar">
   <div class="qrtext">

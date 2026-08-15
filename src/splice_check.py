@@ -48,7 +48,7 @@ def main() -> int:
     print(f"比對筆數：{len(periods)} 期 × {len(COMPARABLE)} 欄 = "
           f"{len(periods) * len(COMPARABLE)} 筆\n")
 
-    # 差異定義：以 7164（主序列）為分母。此為規格未寫明、實作者自行選定的
+    # 差異定義：以 7164（主序列）為分母。此為預先登記未寫明、實作時選定的
     # 判準，理由：接合規則指定 7164 為主，分母取主序列語義一致。
     rows: list[tuple[str, str, int, int, int, float]] = []
     for period in periods:

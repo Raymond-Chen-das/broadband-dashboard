@@ -6,7 +6,7 @@ __pycache__/
 # PostgreSQL 資料（由 docker named volume 管理；此列防止本機誤產生的目錄進版控）
 pgdata/
 
-# 備份檔（依治理規則，驗證通過即刪；萬一遺留也不進版控）
+# 備份檔（驗證通過即刪；萬一遺留也不進版控）
 *.bak
 *.bak-*
 
@@ -14,12 +14,8 @@ pgdata/
 Thumbs.db
 desktop.ini
 
-# 內部文件（AI 協作指示與職缺對應設計，僅本機，不公開）
+# 內部工作文件（僅本機，不公開）
 CLAUDE.md
 docs/10-project-spec.md
-
-# �w���n�O��x�]�H����̲Ĥ@�H�ټg���I�u��x�A�ȥ����A�����}�^
-logs/decisions.log
-
-# �M���y��]�w�]Ū�̬O���⪺�H�Υ��Ӫ��ۤv�A�D repo �X�ȡF�ȥ����^
 docs/decision-trail.md
+logs/decisions.log
